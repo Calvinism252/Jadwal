@@ -155,11 +155,24 @@ table td:first-child{border-right:2px solid var(--muted);padding-right:12px;}
     width: 3px;
     left: -1px;
   }
-  
   .controls {
-    gap: 6px;
-  }
-  
+  gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.controls-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.controls-row.bottom button {
+  min-width: 140px;
+}
   .controls button {
     padding: 6px 8px;
     font-size: 13px;
@@ -186,12 +199,21 @@ table td:first-child{border-right:2px solid var(--muted);padding-right:12px;}
 </header>
 <div class="card">
 <div class="controls">
-  <button id="prev" title="Bulan sebelumnya (←)">⬅️</button>
-  <input type="month" id="monthPicker" title="Pilih bulan">
-  <button id="next" title="Bulan berikutnya (→)">➡️</button>
-  <button onclick="openShiftModal()" title="Atur shift hari ini">⚙️ Custom Shift</button>
-  <button id="colorBtn" aria-label="Customize shift colors" title="Kustom warna (Ctrl+C)">🎨 Kustomisasi Warna</button>
-  <button class="primary" onclick="exportToPDF()" title="Cetak jadwal (Ctrl+P)">🖨️ Cetak / PDF</button>
+
+  <!-- BARIS ATAS -->
+  <div class="controls-row">
+    <button id="prev" title="Bulan sebelumnya">⬅️</button>
+    <input type="month" id="monthPicker">
+    <button id="next" title="Bulan berikutnya">➡️</button>
+  </div>
+
+  <!-- BARIS BAWAH -->
+  <div class="controls-row bottom">
+    <button onclick="openShiftModal()">⚙️ Custom Shift</button>
+    <button id="colorBtn">🎨 Kustomisasi Warna</button>
+    <button class="primary" onclick="exportToPDF()">🖨️ Cetak / PDF</button>
+  </div>
+
 </div>
 <table>
 <thead>
@@ -952,4 +974,4 @@ const now = new Date();
 setMonth(now.getFullYear(), now.getMonth());
 </script>
 </body>
-  </html>
+</html>
