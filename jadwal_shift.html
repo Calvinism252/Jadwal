@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jadwal Kerja Shift</title>
+<style>
+:root{
+  --bg:#f2f4f7; --card:#fff; --text:#1f2937; --muted:#6b7280;
+  --pagi:#fde68a; --sore:#bae6fd; --malam:#d1d5db; --libur:#f9a8d4;
+  --today:#2563eb22; --select:#000;
+  --accent:#3b82f6; --accent-gradient:linear-gradient(to right, #3b82f6, #8b5cf6);
+}
+body.dark{
+  --bg:#0f172a; --card:#1e293b; --text:#e5e7eb; --muted:#9ca3af;
+  --pagi:#92400e; --sore:#075985; --malam:#374151; --libur:#065f46;
+  --today:#38bdf822; --select:#fff;
+  --accent:#60a5fa; --accent-gradient:linear-gradient(to right, #60a5fa, #a78bfa);
+}
+body{
+  margin:0; font-family:system-ui,sans-serif;
+  background:var(--bg); color:var(--text); transition:.3s;
+}
+
+/* Fullscreen mode styles */
+body:fullscreen {
+  background: var(--bg);
+  padding: 20px;
+}
+
+body:fullscreen .container {
+  max-width: 95%;
+  margin: auto;
+}
+body:fullscreen .card {
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+body:fullscreen table {
+  font-size: 14px;
+}
+
+body:fullscreen .badge {
+  width: 80px;
+  padding: 6px 0;
+}
+
+body:fullscreen .controls {
+  margin-bottom: 15px;
+}
+
+body:-webkit-full-screen {
+  background: var(--bg);
+  padding: 20px;
+}
+
+body:-webkit-full-screen .container {
+  max-width: 95%;
+  margin: auto;
+}
+
+.container{max-width:920px;margin:auto;padding:16px;}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+h1{font-size:20px;margin:0;}
+.sub{color:var(--muted);font-size:13px;}
+.card{background:var(--card);border-radius:14px;box-shadow:0 10px 25px rgba(0,0,0,.08);padding:14px;}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;justify-content:center;align-items:center;
+}
+input,button,select{padding:7px 10px;border-radius:10px;border:1px solid #cbd5e1;background:transparent;color:var(--text);cursor:pointer;}
+button.primary{background:#2563eb;color:#fff;border:none;}
+button.primary:hover{background:#1d4ed8;}
+table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;}
+th,td{padding:8px;text-align:center;border-bottom:1px solid #e5e7eb33;}
+th{color:var(--muted);}
+tr.today{background:var(--today);}
+
+/* ==== STYLE BARU UNTUK SELECTED ROW ==== */
+tr.selected {
+  position: relative;
+  background: linear-gradient(90deg, transparent 0%, rgba(37, 99, 235, 0.08) 50%, transparent 100%);
+  box-shadow: 
+    inset 0 2px 12px rgba(37, 99, 235, 0.1),
+    inset 0 -2px 12px rgba(37, 99, 235, 0.1);
+}
+
+tr.selected td {
+  position: relative;
+}
+
+/* Garis samping kiri yang aesthetic */
+tr.selected td:first-child::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 70%;
+  background: var(--accent-gradient);
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+/* Efek pada badge di row terpilih */
+tr.selected .badge {
+  transform: scale(1.05);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 1;
+}
+
+/* Efek hover yang smooth */
+tr:not(.selected):hover {
+  background: rgba(0, 0, 0, 0.04);
+  transition: background 0.2s ease;
+  cursor: pointer;
+}
+
+body.dark tr:not(.selected):hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Animation subtle untuk selected row */
+@keyframes gentleGlow {
+  0% { background: linear-gradient(90deg, transparent 0%, rgba(37, 99, 235, 0.06) 50%, transparent 100%); }
+  50% { background: linear-gradient(90deg, transparent 0%, rgba(37, 99, 235, 0.12) 50%, transparent 100%); }
+  100% { background: linear-gradient(90deg, transparent 0%, rgba(37, 99, 235, 0.06) 50%, transparent 100%); }
+}
+
+tr.selected {
+  animation: gentleGlow 4s ease-in-out infinite;
+}
+
+/* ==== END STYLE BARU ==== */
+
+.badge{display:inline-block;width:70px;text-align:center;padding:4px 0;border-radius:999px;font-weight:600;font-size:12px;transition:all 0.2s ease;}
+.pagi{background:var(--pagi);}
+.sore{background:var(--sore);}
+.malam{background:var(--malam);}
+.libur{background:var(--libur);}
+.sunday{color:#ef4444;}
+.holiday-note{display:block;font-size:11px;color:#ef4444;}
+/* Garis vertikal tanggal & jadwal */
+table td:first-child{border-right:2px solid var(--muted);padding-right:12px;}
+
+/* Mobile fix */
+@media (max-width:768px){
+  .card{padding:12px;}
+  table td:first-child{min-width:80px;padding-right:10px;}
+  .badge{width:58px;font-size:11px;}
+  th,td{padding:6px 3px;}
+  tr.selected td:first-child::before {
+    width: 3px;
+    left: -1px;
+  }
+  
+  .controls {
+    gap: 6px;
+  }
+  
+  .controls button {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+}
+
+/* Modal Warna */
+#colorModal {
+  z-index: 1000;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <div>
+    <h1>📅 Jadwal Kerja Shift</h1>
+    <div class="sub" id="monthLabel"></div>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <button id="fullscreenToggle" aria-label="Toggle fullscreen" title="Fullscreen (F11)">⛶</button>
+    <button id="darkToggle" aria-label="Toggle dark mode" title="Dark Mode (Ctrl+D)">🌙</button>
+  </div>
+</header>
+<div class="card">
+<div class="controls">
+  <button id="prev" title="Bulan sebelumnya (←)">⬅️</button>
+  <input type="month" id="monthPicker" title="Pilih bulan">
+  <button id="next" title="Bulan berikutnya (→)">➡️</button>
+  <button onclick="openShiftModal()" title="Atur shift hari ini">⚙️ Custom Shift</button>
+  <button id="colorBtn" aria-label="Customize shift colors" title="Kustom warna (Ctrl+C)">🎨 Kustomisasi Warna</button>
+  <button class="primary" onclick="exportToPDF()" title="Cetak jadwal (Ctrl+P)">🖨️ Cetak / PDF</button>
+</div>
+<table>
+<thead>
+<tr>
+  <th>Tanggal</th><th>A</th><th>B</th><th>C</th><th>D</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+</div>
+
+<!-- Modal Warna -->
+<div id="colorModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#00000055;justify-content:center;align-items:center;z-index:1000;">
+<div style="background:var(--card);padding:20px;border-radius:14px;min-width:250px;max-width:90%;">
+<h3 style="margin:0 0 15px 0;">Kustomisasi Warna Shift</h3>
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:10px;">
+<label style="display:flex;justify-content:space-between;align-items:center;">Pagi <input type="color" id="colorPagi"></label>
+<label style="display:flex;justify-content:space-between;align-items:center;">Sore <input type="color" id="colorSore"></label>
+<label style="display:flex;justify-content:space-between;align-items:center;">Malam <input type="color" id="colorMalam"></label>
+<label style="display:flex;justify-content:space-between;align-items:center;">Libur <input type="color" id="colorLibur"></label>
+</div>
+<div style="margin-top:18px;display:flex;justify-content:space-between;">
+<button id="resetColors">Reset</button>
+<div style="display:flex;gap:8px;">
+<button id="cancelModal">Batal</button>
+<button id="saveColors" class="primary">Simpan</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Modal Setting Shift Hari Ini -->
+<div id="shiftModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#00000055;justify-content:center;align-items:center;z-index:1000;">
+  <div style="background:var(--card);padding:24px;border-radius:14px;min-width:320px;max-width:90%;">
+    <h3 style="margin:0 0 15px 0;display:flex;align-items:center;gap:8px;">⚙️ Pengaturan Shift </h3>
+    
+    <div style="background:var(--today);padding:10px 14px;border-radius:8px;margin-bottom:15px;font-size:13px;" id="shiftInfo">
+      <strong>Atur shift hari ini:</strong> <span id="todayDateLabel">Jumat, 26 Desember 2025</span>
+    </div>
+    
+    <div style="display:grid;gap:12px;margin-top:10px;">
+      <label style="display:flex;justify-content:space-between;align-items:center;">
+        <span><strong>Grup A</strong></span>
+        <select id="shiftA" style="padding:6px 12px;border-radius:8px;background:var(--card);color:var(--text);min-width:140px;">
+          <option value="0">Pagi 1</option>
+          <option value="1">Pagi 2</option>
+          <option value="2">Sore 1</option>
+          <option value="3">Sore 2</option>
+          <option value="4">Malam 1</option>
+          <option value="5">Malam 2</option>
+          <option value="6">Libur 1</option>
+          <option value="7">Libur 2</option>
+        </select>
+      </label>
+      <label style="display:flex;justify-content:space-between;align-items:center;">
+        <span><strong>Grup B</strong></span>
+        <select id="shiftB" style="padding:6px 12px;border-radius:8px;background:var(--card);color:var(--text);min-width:140px;">
+          <option value="0">Pagi 1</option>
+          <option value="1">Pagi 2</option>
+          <option value="2">Sore 1</option>
+          <option value="3">Sore 2</option>
+          <option value="4">Malam 1</option>
+          <option value="5">Malam 2</option>
+          <option value="6">Libur 1</option>
+          <option value="7">Libur 2</option>
+        </select>
+      </label>
+      <label style="display:flex;justify-content:space-between;align-items:center;">
+        <span><strong>Grup C</strong></span>
+        <select id="shiftC" style="padding:6px 12px;border-radius:8px;background:var(--card);color:var(--text);min-width:140px;">
+          <option value="0">Pagi 1</option>
+          <option value="1">Pagi 2</option>
+          <option value="2">Sore 1</option>
+          <option value="3">Sore 2</option>
+          <option value="4">Malam 1</option>
+          <option value="5">Malam 2</option>
+          <option value="6">Libur 1</option>
+          <option value="7">Libur 2</option>
+        </select>
+      </label>
+      <label style="display:flex;justify-content:space-between;align-items:center;">
+        <span><strong>Grup D</strong></span>
+        <select id="shiftD" style="padding:6px 12px;border-radius:8px;background:var(--card);color:var(--text);min-width:140px;">
+          <option value="0">Pagi 1</option>
+          <option value="1">Pagi 2</option>
+          <option value="2">Sore 1</option>
+          <option value="3">Sore 2</option>
+          <option value="4">Malam 1</option>
+          <option value="5">Malam 2</option>
+          <option value="6">Libur 1</option>
+          <option value="7">Libur 2</option>
+        </select>
+      </label>
+    </div>
+    
+    <div style="margin-top:20px;padding-top:15px;border-top:1px solid rgba(0,0,0,0.1);">
+      <div style="display:flex;justify-content:space-between;">
+        <button onclick="closeShiftModal()">Batal</button>
+        <div style="display:flex;gap:8px;">
+          <button onclick="resetShiftToDefault()" style="background:transparent;border:1px solid var(--muted);">Reset ke Default</button>
+          <button class="primary" onclick="saveShift()">Simpan Setting</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== KONSTANTA & VARIABEL =====
+const START_DATE = new Date(2025, 11, 22); // 22 Desember 2025
+const SHIFT_CYCLE = ["Pagi","Pagi","Sore","Sore","Malam","Malam","Libur","Libur"];
+const OFFSETS = { A: 6, B: 4, C: 2, D: 0 }; // Offset default
+
+// Hitung default shift dari START_DATE
+function calculateDefaultShift() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const startDate = new Date(START_DATE);
+  startDate.setHours(0, 0, 0, 0);
+  
+  // Hitung selisih hari dari START_DATE ke hari ini
+  const diffMs = today - startDate;
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+  
+  // Hitung posisi di siklus 8-hari
+  const cyclePosition = ((diffDays % 8) + 8) % 8;
+  
+  // Hitung shift index untuk tiap grup
+  const result = {};
+  ["A", "B", "C", "D"].forEach(grup => {
+    result[grup] = (cyclePosition + OFFSETS[grup]) % 8;
+  });
+  
+  return result;
+}
+
+// Setting awal (dihitung dari START_DATE)
+let BASE_SHIFT = JSON.parse(localStorage.getItem("baseShift")) || calculateDefaultShift();
+
+// ===== VARIABEL =====
+let currentYear, currentMonth, HOLIDAYS = {}, scrolled = false, selectedDateKey = null;
+let renderTimeout = null;
+
+// ===== ELEMENTS =====
+const tableBody = document.getElementById("tableBody");
+const monthPicker = document.getElementById("monthPicker");
+const monthLabel = document.getElementById("monthLabel");
+const darkToggle = document.getElementById("darkToggle");
+const colorBtn = document.getElementById("colorBtn");
+const colorModal = document.getElementById("colorModal");
+const colorPagi = document.getElementById("colorPagi");
+const colorSore = document.getElementById("colorSore");
+const colorMalam = document.getElementById("colorMalam");
+const colorLibur = document.getElementById("colorLibur");
+const resetColors = document.getElementById("resetColors");
+const cancelModal = document.getElementById("cancelModal");
+const saveColors = document.getElementById("saveColors");
+const fullscreenToggle = document.getElementById("fullscreenToggle");
+const shiftModal = document.getElementById("shiftModal");
+const todayDateLabel = document.getElementById("todayDateLabel");
+
+// ===== FUNGSI UTAMA: HITUNG SHIFT =====
+function getShiftForDate(grup, targetDate) {
+  // 1. Tentukan shift grup pada HARI INI (dari BASE_SHIFT)
+  const todayShiftIndex = BASE_SHIFT[grup];
+  
+  // 2. Hitung selisih hari antara targetDate dengan hari ini
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const target = new Date(targetDate);
+  target.setHours(0, 0, 0, 0);
+  
+  const diffMs = target - today;
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+  
+  // 3. Hitung shift index untuk tanggal target
+  let targetIndex = (todayShiftIndex + diffDays) % 8;
+  if (targetIndex < 0) targetIndex += 8;
+  
+  // 4. Ambil label dari SHIFT_CYCLE
+  return SHIFT_CYCLE[targetIndex];
+}
+
+// ===== HELPER FUNCTIONS =====
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function updateMonthLabel() {
+  const monthName = new Date(currentYear, currentMonth).toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+  monthLabel.innerHTML = monthName;
+}
+
+function updateTodayDateLabel() {
+  const today = new Date();
+  const todayFormatted = today.toLocaleDateString("id-ID", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
+  todayDateLabel.textContent = todayFormatted;
+}
+
+// ===== LOADING HOLIDAYS =====
+async function loadHolidays(year) {
+  const originalText = monthLabel.textContent;
+  monthLabel.textContent = "Memuat hari libur...";
+  
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    
+    const r = await fetch(`https://api-harilibur.vercel.app/api?year=${year}`, {
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    
+    const d = await r.json();
+    HOLIDAYS = {};
+    d.forEach(i => i.is_national_holiday && (HOLIDAYS[i.holiday_date] = i.holiday_name));
+    
+  } catch (err) {
+    console.log("Gagal memuat hari libur:", err.message);
+    HOLIDAYS = {};
+    updateMonthLabel();
+    return;
+  }
+  
+  updateMonthLabel();
+}
+
+// ===== RENDER FUNCTIONS =====
+function scheduleRender() {
+  if (renderTimeout) clearTimeout(renderTimeout);
+  renderTimeout = setTimeout(render, 50);
+}
+
+function render() {
+  tableBody.innerHTML = "";
+  const todayKey = dateKey(new Date());
+  const days = new Date(currentYear, currentMonth + 1, 0).getDate();
+  
+  for (let d = 1; d <= days; d++) {
+    const date = new Date(currentYear, currentMonth, d);
+    const key = dateKey(date);
+    const tr = document.createElement("tr");
+    
+    if (key === todayKey) tr.classList.add("today");
+    if (key === selectedDateKey) tr.classList.add("selected");
+    
+    tr.onclick = () => {
+      selectedDateKey = (selectedDateKey === key) ? null : key;
+      scheduleRender();
+    }
+    
+    const tdDate = document.createElement("td");
+    tdDate.innerHTML = date.toLocaleDateString("id-ID", { weekday: "short", day: "2-digit" });
+    
+    if (HOLIDAYS[key]) tdDate.innerHTML += `<span class="holiday-note">${HOLIDAYS[key]}</span>`;
+    if (date.getDay() === 0) tdDate.classList.add("sunday");
+    
+    tr.appendChild(tdDate);
+    
+    ["A", "B", "C", "D"].forEach(grup => {
+      const td = document.createElement("td");
+      const shift = getShiftForDate(grup, date);
+      td.innerHTML = `<span class="badge ${shift.toLowerCase()}">${shift}</span>`;
+      tr.appendChild(td);
+    });
+    
+    tableBody.appendChild(tr);
+    
+    if (!scrolled && key === todayKey) {
+      setTimeout(() => {
+        tr.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+      }, 150);
+      scrolled = true;
+    }
+  }
+}
+
+// ===== FUNGSI EXPORT PDF =====
+function exportToPDF() {
+  const monthName = new Date(currentYear, currentMonth).toLocaleDateString('id-ID', {
+    month: 'long',
+    year: 'numeric'
+  });
+  
+  const currentDate = new Date().toLocaleDateString('id-ID', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+  
+  let tableHTML = '';
+  const days = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const todayKey = dateKey(new Date());
+  
+  for (let d = 1; d <= days; d++) {
+    const date = new Date(currentYear, currentMonth, d);
+    const key = dateKey(date);
+    const dateStr = date.toLocaleDateString('id-ID', { weekday: 'short', day: '2-digit' });
+    const isSunday = date.getDay() === 0;
+    const isToday = key === todayKey;
+    const holidayNote = HOLIDAYS[key] ? `<span class="holiday-note">${HOLIDAYS[key]}</span>` : '';
+    
+    let rowClass = '';
+    if (isToday) rowClass = 'today';
+    
+    tableHTML += `<tr${rowClass ? ` class="${rowClass}"` : ''}>`;
+    tableHTML += `<td${isSunday ? ' class="sunday"' : ''}>${dateStr}${holidayNote}</td>`;
+    
+    ['A', 'B', 'C', 'D'].forEach(grup => {
+      const shift = getShiftForDate(grup, date);
+      tableHTML += `<td><span class="badge ${shift.toLowerCase()}">${shift}</span></td>`;
+    });
+    
+    tableHTML += '</tr>';
+  }
+  
+  const printHTML = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Jadwal Shift - ${monthName}</title>
+<style>
+    /* RESET & BASICS */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    @page {
+      size: A4 portrait;
+      margin: 4mm; /* Margin minimal */
+    }
+    
+    body {
+      font-family: 'Arial Narrow', Arial, sans-serif; /* Font ramping */
+      width: 202mm; /* 210mm - 8mm margin */
+      height: 289mm; /* 297mm - 8mm margin */
+      padding: 2mm;
+      background: white;
+      color: black;
+      font-size: 9px; /* Base font kecil */
+      line-height: 1;
+    }
+    
+    /* HEADER SUPER MINIMAL */
+    .header {
+      text-align: center;
+      margin-bottom: 3mm;
+      padding-bottom: 2mm;
+      border-bottom: 0.3mm solid #333;
+    }
+    
+    .title {
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: -0.2px;
+      margin-bottom: 1px;
+    }
+    
+    .subtitle {
+      font-size: 11px;
+      color: #555;
+      margin-bottom: 1px;
+    }
+    
+    .date {
+      font-size: 8px;
+      color: #777;
+      font-style: italic;
+    }
+    
+    /* TABLE ULTRA COMPACT */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5px;
+      table-layout: fixed;
+      margin: 0;
+    }
+    
+    th {
+      background: #f8f8f8;
+      font-weight: bold;
+      padding: 3px 0;
+      border: 0.3mm solid #aaa;
+      font-size: 9px;
+      height: 20px;
+    }
+    
+    td {
+      border: 0.2mm solid #ccc;
+      padding: 2px 0;
+      text-align: center;
+      vertical-align: middle;
+      height: 18px;
+      overflow: hidden;
+    }
+    
+    /* KOLOM TANGGAL SEMPIT */
+    .date-cell {
+      width: 60px !important;
+      min-width: 60px;
+      max-width: 60px;
+      text-align: left;
+      padding-left: 4px;
+      font-weight: 600;
+      border-right: 0.3mm solid #666;
+      font-size: 8px;
+    }
+    
+    /* BADGE MINIMALIS */
+    .badge {
+      display: inline-block;
+      width: 38px;
+      padding: 1px 0;
+      font-size: 7px;
+      font-weight: bold;
+      border-radius: 3px;
+      margin: 0 auto;
+      line-height: 1.1;
+      letter-spacing: -0.1px;
+      border: 0.2mm solid rgba(0,0,0,0.1);
+    }
+    
+    /* WARNA SHIFT - PASTEL RENDAH */
+    .pagi { background: #fff8e1; color: #5d4037; }
+    .sore { background: #e1f5fe; color: #01579b; }
+    .malam { background: #f5f5f5; color: #212121; }
+    .libur { background: #fce4ec; color: #880e4f; }
+    
+    /* HARI MINGGU & LIBUR */
+    .sunday { color: #d32f2f !important; }
+    .holiday {
+      font-size: 6px;
+      display: block;
+      line-height: 1;
+      margin-top: 0.5px;
+      color: #d32f2f;
+      font-style: italic;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    /* FOOTER HAMPIR TAK TERLIHAT */
+    .footer {
+      text-align: center;
+      margin-top: 3mm;
+      font-size: 7px;
+      color: #999;
+      opacity: 0.7;
+    }
+    
+    /* NO HIGHLIGHTS IN PRINT */
+    .today { background: transparent !important; }
+    
+    /* PRINT OPTIMIZATION */
+    @media print {
+      body { 
+        padding: 1mm;
+        font-size: 8.5px;
+      }
+      .badge { 
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+    </head>
+    <body>
+      <div class="print-header">
+        <div class="print-title">JADWAL KERJA SHIFT</div>
+        <div class="print-month">${monthName}</div>
+        <div class="print-date">Dicetak: ${currentDate}</div>
+      </div>
+      
+      <table>
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>A</th>
+            <th>B</th>
+            <th>C</th>
+            <th>D</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableHTML}
+        </tbody>
+      </table>
+      
+      <div class="print-footer">
+        Jadwal Shift &copy; ${new Date().getFullYear()} - Generated by Shift Planner
+      </div>
+      
+      <script>
+        window.onload = function() {
+          setTimeout(function() {
+            window.print();
+            setTimeout(function() {
+              if (!/Android/.test(navigator.userAgent)) {
+                window.close();
+              }
+            }, 500);
+          }, 300);
+        };
+      <\/script>
+    </body>
+    </html>
+  `;
+  
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) {
+    alert('Popup diblokir! Izinkan popup untuk mencetak PDF.');
+    return;
+  }
+  
+  printWindow.document.open();
+  printWindow.document.write(printHTML);
+  printWindow.document.close();
+}
+
+// ===== MONTH CONTROLS =====
+function setMonth(year, month) {
+  currentYear = year;
+  currentMonth = month;
+  monthPicker.value = `${year}-${String(month + 1).padStart(2, "0")}`;
+  scrolled = false;
+  
+  loadHolidays(year).then(() => {
+    scheduleRender();
+  });
+}
+
+document.getElementById("prev").onclick = () => {
+  let y = currentYear, m = currentMonth - 1;
+  if (m < 0) { m = 11; y--; }
+  setMonth(y, m);
+};
+
+document.getElementById("next").onclick = () => {
+  let y = currentYear, m = currentMonth + 1;
+  if (m > 11) { m = 0; y++; }
+  setMonth(y, m);
+};
+
+monthPicker.onchange = e => {
+  const [y, m] = e.target.value.split("-");
+  setMonth(+y, +m - 1);
+};
+
+// ===== FULLSCREEN =====
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      document.documentElement.webkitRequestFullscreen();
+    } else if (document.documentElement.msRequestFullscreen) {
+      document.documentElement.msRequestFullscreen();
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  }
+}
+
+fullscreenToggle.onclick = toggleFullscreen;
+
+document.addEventListener('fullscreenchange', updateFullscreenButton);
+document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+document.addEventListener('msfullscreenchange', updateFullscreenButton);
+
+function updateFullscreenButton() {
+  if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+    fullscreenToggle.innerHTML = '🚫';
+    fullscreenToggle.title = 'Keluar Fullscreen (F11)';
+  } else {
+    fullscreenToggle.innerHTML = '⛶';
+    fullscreenToggle.title = 'Fullscreen (F11)';
+  }
+}
+
+// ===== DARK MODE =====
+if (localStorage.getItem("dark") === "1") document.body.classList.add("dark");
+darkToggle.onclick = () => {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("dark", document.body.classList.contains("dark") ? "1" : "0");
+};
+
+// ===== COLOR MODAL =====
+colorBtn.onclick = () => {
+  colorModal.style.display = "flex";
+  loadSavedColors();
+};
+
+cancelModal.onclick = () => {
+  colorModal.style.display = "none";
+};
+
+function loadSavedColors() {
+  colorPagi.value = localStorage.getItem("colorPagi") || "#fde68a";
+  colorSore.value = localStorage.getItem("colorSore") || "#bae6fd";
+  colorMalam.value = localStorage.getItem("colorMalam") || "#d1d5db";
+  colorLibur.value = localStorage.getItem("colorLibur") || "#f9a8d4";
+}
+
+resetColors.onclick = () => {
+  if (confirm("Yakin ingin mengembalikan warna ke default? Semua warna kustom akan dihapus.")) {
+    localStorage.removeItem("colorPagi");
+    localStorage.removeItem("colorSore");
+    localStorage.removeItem("colorMalam");
+    localStorage.removeItem("colorLibur");
+    loadSavedColors();
+    saveColors.click();
+  }
+};
+
+saveColors.onclick = () => {
+  localStorage.setItem("colorPagi", colorPagi.value);
+  localStorage.setItem("colorSore", colorSore.value);
+  localStorage.setItem("colorMalam", colorMalam.value);
+  localStorage.setItem("colorLibur", colorLibur.value);
+  applyColors();
+  colorModal.style.display = "none";
+};
+
+function applyColors() {
+  document.documentElement.style.setProperty("--pagi", localStorage.getItem("colorPagi") || "#fde68a");
+  document.documentElement.style.setProperty("--sore", localStorage.getItem("colorSore") || "#bae6fd");
+  document.documentElement.style.setProperty("--malam", localStorage.getItem("colorMalam") || "#d1d5db");
+  document.documentElement.style.setProperty("--libur", localStorage.getItem("colorLibur") || "#f9a8d4");
+}
+
+applyColors();
+
+// ===== SHIFT MODAL FUNCTIONS =====
+function openShiftModal() {
+  updateTodayDateLabel();
+  
+  // Set dropdown sesuai setting saat ini
+  document.getElementById("shiftA").value = BASE_SHIFT.A;
+  document.getElementById("shiftB").value = BASE_SHIFT.B;
+  document.getElementById("shiftC").value = BASE_SHIFT.C;
+  document.getElementById("shiftD").value = BASE_SHIFT.D;
+  
+  shiftModal.style.display = "flex";
+}
+
+function closeShiftModal() {
+  shiftModal.style.display = "none";
+}
+
+function resetShiftToDefault() {
+  if (confirm("Reset shift ke pengaturan default?")) {
+    // Hitung ulang default shift dari START_DATE
+    BASE_SHIFT = calculateDefaultShift();
+    
+    // Update dropdown
+    document.getElementById("shiftA").value = BASE_SHIFT.A;
+    document.getElementById("shiftB").value = BASE_SHIFT.B;
+    document.getElementById("shiftC").value = BASE_SHIFT.C;
+    document.getElementById("shiftD").value = BASE_SHIFT.D;
+    
+    // Hapus dari localStorage (biar pakai default)
+    localStorage.removeItem("baseShift");
+    
+    // Render ulang
+    scheduleRender();
+  }
+}
+
+function saveShift() {
+  BASE_SHIFT.A = parseInt(document.getElementById("shiftA").value);
+  BASE_SHIFT.B = parseInt(document.getElementById("shiftB").value);
+  BASE_SHIFT.C = parseInt(document.getElementById("shiftC").value);
+  BASE_SHIFT.D = parseInt(document.getElementById("shiftD").value);
+  
+  localStorage.setItem("baseShift", JSON.stringify(BASE_SHIFT));
+  closeShiftModal();
+  scheduleRender();
+}
+
+shiftModal.addEventListener("click", function (e) {
+  if (e.target === shiftModal) closeShiftModal();
+});
+
+// ===== KEYBOARD NAVIGATION =====
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'ArrowLeft' && !e.ctrlKey && !e.altKey) {
+    e.preventDefault();
+    document.getElementById('prev').click();
+  }
+  
+  if (e.key === 'ArrowRight' && !e.ctrlKey && !e.altKey) {
+    e.preventDefault();
+    document.getElementById('next').click();
+  }
+  
+  if (e.key === 'Escape' && selectedDateKey) {
+    selectedDateKey = null;
+    scheduleRender();
+  }
+  
+  if (e.key === 'F11') {
+    e.preventDefault();
+    toggleFullscreen();
+  }
+  
+  if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+    e.preventDefault();
+    exportToPDF();
+  }
+  
+  if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+    e.preventDefault();
+    darkToggle.click();
+  }
+  
+  if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+    e.preventDefault();
+    colorBtn.click();
+  }
+  
+  if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+    e.preventDefault();
+    toggleFullscreen();
+  }
+  
+  // Ctrl+S untuk buka setting shift
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    openShiftModal();
+  }
+});
+
+// ===== INITIALIZE =====
+const now = new Date();
+setMonth(now.getFullYear(), now.getMonth());
+</script>
+</body>
+</html>
