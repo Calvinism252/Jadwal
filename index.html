@@ -11,15 +11,29 @@
   --today:#2563eb22; --select:#000;
   --accent:#3b82f6; --accent-gradient:linear-gradient(to right, #3b82f6, #8b5cf6);
 }
+  *{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body.dark{
   --bg:#0f172a; --card:#1e293b; --text:#e5e7eb; --muted:#9ca3af;
   --pagi:#92400e; --sore:#075985; --malam:#374151; --libur:#065f46;
   --today:#38bdf822; --select:#fff;
   --accent:#60a5fa; --accent-gradient:linear-gradient(to right, #60a5fa, #a78bfa);
 }
+  html, body{
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  overflow-x: hidden;
+}
 body{
   margin:0; font-family:system-ui,sans-serif;
-  background:var(--bg); color:var(--text); transition:.3s;
+  background:var(--bg);
+  color:var(--text); 
+  transition:.3s;
 }
 
 /* Fullscreen mode styles */
@@ -191,7 +205,14 @@ table td:first-child{border-right:2px solid var(--muted);padding-right:12px;}
   justify-content: center;
   flex-wrap: wrap;
 }
-
+input[type="month"] {
+  min-width: 220px;     /* INI KUNCI */
+  padding: 10px 25px 10px 14px;
+  font-size: 15px;
+  font-weight: 400;
+  text-align: center;
+  flex: 0 0 auto;       /* JANGAN DIKECILKAN FLEX */
+}
 .controls-row.bottom button {
   min-width: 140px;
 }
@@ -362,7 +383,7 @@ body:-webkit-full-screen .badge{
 
 <script>
 // ===== KONSTANTA & VARIABEL =====
-const START_DATE = new Date(2025, 11, 22); // 22 Desember 2025
+const START_DATE = new Date(); // 22 Desember 2025
 const SHIFT_CYCLE = ["Pagi","Pagi","Sore","Sore","Malam","Malam","Libur","Libur"];
 const OFFSETS = { A: 6, B: 4, C: 2, D: 0 }; // Offset default
 
@@ -598,7 +619,6 @@ function exportToPDF() {
     tableHTML += '</tr>';
   }
   
-// GANTI bagian CSS di dalam printHTML dengan ini:
 
 const printHTML = `
 <!DOCTYPE html>
