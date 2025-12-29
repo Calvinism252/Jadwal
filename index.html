@@ -383,7 +383,7 @@ body:-webkit-full-screen .badge{
 
 <script>
 // ===== KONSTANTA & VARIABEL =====
-const START_DATE = new Date(); // 22 Desember 2025
+const START_DATE = new Date(2025, 11, 22); // 22 Desember 2025
 const SHIFT_CYCLE = ["Pagi","Pagi","Sore","Sore","Malam","Malam","Libur","Libur"];
 const OFFSETS = { A: 6, B: 4, C: 2, D: 0 }; // Offset default
 
@@ -1056,6 +1056,8 @@ document.addEventListener('keydown', function (e) {
 // ===== INITIALIZE =====
 const now = new Date();
 setMonth(now.getFullYear(), now.getMonth());
+// RESET SEMUA LOCALSTORAGE (PAKAI SEKALI AJA)
+localStorage.clear();
 </script>
 </body>
 </html>
