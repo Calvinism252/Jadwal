@@ -3,40 +3,157 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jadwal Kerja Shift</title>
+<title>Jadwal Kerja Shift Premium dengan Perhitungan Biasa</title>
 <style>
-:root{
-  --bg:#f2f4f7; --card:#fff; --text:#1f2937; --muted:#6b7280;
-  --pagi:#fde68a; --sore:#bae6fd; --malam:#d1d5db; --libur:#f9a8d4;
-  --today:#2563eb22; --select:#000;
-  --accent:#3b82f6; --accent-gradient:linear-gradient(to right, #3b82f6, #8b5cf6);
+/* ===== VARIABLES & BASE STYLES ===== */
+:root {
+  /* Default Theme */
+  --bg: #f2f4f7;
+  --card: #fff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --pagi: #fde68a;
+  --sore: #bae6fd;
+  --malam: #d1d5db;
+  --libur: #f9a8d4;
+  --today: #2563eb22;
+  --select: #000;
+  --accent: #3b82f6;
+  --accent-gradient: linear-gradient(to right, #3b82f6, #8b5cf6);
+  --shadow: 0 10px 25px rgba(0,0,0,.08);
+  --border: #cbd5e1;
+  --header-bg: transparent;
+  --badge-text: #000;
+  --theme-bg: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="white"/></svg>');
 }
-  *{
+
+/* ===== THEME DEFINITIONS ===== */
+body.theme-lebaran {
+  --bg: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
+  --card: #ffffff;
+  --text: #1a202c;
+  --muted: #718096;
+  --pagi: linear-gradient(135deg, #f6e05e, #d69e2e);
+  --sore: linear-gradient(135deg, #68d391, #38a169);
+  --malam: linear-gradient(135deg, #90cdf4, #4299e1);
+  --libur: linear-gradient(135deg, #fbb6ce, #ed64a6);
+  --today: rgba(104, 211, 145, 0.2);
+  --accent: #38a169;
+  --accent-gradient: linear-gradient(to right, #38a169, #2f855a);
+  --shadow: 0 10px 30px rgba(56, 161, 105, 0.15);
+  --border: #c6f6d5;
+  --header-bg: linear-gradient(135deg, #38a169, #2f855a);
+  --badge-text: #fff;
+  --theme-bg: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%2338a169" opacity="0.1"/><path d="M20,20 Q50,5 80,20 T140,20" stroke="%2338a169" stroke-width="2" fill="none" opacity="0.3"/></svg>');
+}
+
+body.theme-natal {
+  --bg: linear-gradient(135deg, #fed7d7 0%, #fff5f5 100%);
+  --card: #ffffff;
+  --text: #2d3748;
+  --muted: #718096;
+  --pagi: linear-gradient(135deg, #fc8181, #e53e3e);
+  --sore: linear-gradient(135deg, #9ae6b4, #48bb78);
+  --malam: linear-gradient(135deg, #d69e2e, #b7791f);
+  --libur: linear-gradient(135deg, #fbb6ce, #ed64a6);
+  --today: rgba(229, 62, 62, 0.15);
+  --accent: #e53e3e;
+  --accent-gradient: linear-gradient(to right, #e53e3e, #c53030);
+  --shadow: 0 10px 30px rgba(229, 62, 62, 0.15);
+  --border: #fed7d7;
+  --header-bg: linear-gradient(135deg, #e53e3e, #c53030);
+  --badge-text: #fff;
+  --theme-bg: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23e53e3e" opacity="0.1"/><polygon points="50,10 63,38 93,38 68,55 75,85 50,68 25,85 32,55 7,38 37,38" fill="%23e53e3e" opacity="0.3"/></svg>');
+}
+
+body.theme-halloween {
+  --bg: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  --card: #2d3748;
+  --text: #e2e8f0;
+  --muted: #a0aec0;
+  --pagi: linear-gradient(135deg, #ed8936, #dd6b20);
+  --sore: linear-gradient(135deg, #805ad5, #6b46c1);
+  --malam: linear-gradient(135deg, #000000, #4a5568);
+  --libur: linear-gradient(135deg, #f56565, #e53e3e);
+  --today: rgba(237, 137, 54, 0.25);
+  --accent: #ed8936;
+  --accent-gradient: linear-gradient(to right, #ed8936, #dd6b20);
+  --shadow: 0 10px 30px rgba(237, 137, 54, 0.2);
+  --border: #4a5568;
+  --header-bg: linear-gradient(135deg, #ed8936, #dd6b20);
+  --badge-text: #fff;
+  --theme-bg: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23ed8936" opacity="0.1"/><path d="M30,70 Q50,30 70,70 Q60,90 40,90 Q30,80 30,70" fill="%23ed8936" opacity="0.3"/></svg>');
+}
+
+body.theme-luar-angkasa {
+  --bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  --card: #1e293b;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --pagi: linear-gradient(135deg, #60a5fa, #3b82f6);
+  --sore: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  --malam: linear-gradient(135deg, #1e40af, #1e3a8a);
+  --libur: linear-gradient(135deg, #ec4899, #db2777);
+  --today: rgba(96, 165, 250, 0.25);
+  --accent: #60a5fa;
+  --accent-gradient: linear-gradient(to right, #60a5fa, #8b5cf6);
+  --shadow: 0 10px 30px rgba(96, 165, 250, 0.2);
+  --border: #334155;
+  --header-bg: linear-gradient(135deg, #1e40af, #1e3a8a);
+  --badge-text: #fff;
+  --theme-bg: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%231e40af" opacity="0.1"/><circle cx="20" cy="20" r="2" fill="white" opacity="0.8"/><circle cx="60" cy="40" r="1.5" fill="white" opacity="0.8"/><circle cx="80" cy="70" r="1" fill="white" opacity="0.8"/><circle cx="40" cy="80" r="1.5" fill="white" opacity="0.8"/></svg>');
+}
+
+body.theme-musim-salju {
+  --bg: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+  --card: #ffffff;
+  --text: #1e3a8a;
+  --muted: #475569;
+  --pagi: linear-gradient(135deg, #93c5fd, #60a5fa);
+  --sore: linear-gradient(135deg, #c7d2fe, #a5b4fc);
+  --malam: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  --libur: linear-gradient(135deg, #fecdd3, #fda4af);
+  --today: rgba(96, 165, 250, 0.2);
+  --accent: #3b82f6;
+  --accent-gradient: linear-gradient(to right, #3b82f6, #1d4ed8);
+  --shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
+  --border: #bfdbfe;
+  --header-bg: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  --badge-text: #fff;
+  --theme-bg: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%233b82f6" opacity="0.1"/><path d="M20,40 Q30,20 50,40 Q70,20 80,40 Q70,60 50,40 Q30,60 20,40" fill="%233b82f6" opacity="0.3"/></svg>');
+}
+
+body.dark {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --pagi: #92400e;
+  --sore: #075985;
+  --malam: #374151;
+  --libur: #065f46;
+  --today: #38bdf822;
+  --select: #fff;
+  --accent: #60a5fa;
+  --accent-gradient: linear-gradient(to right, #60a5fa, #a78bfa);
+  --shadow: 0 10px 25px rgba(0,0,0,0.3);
+  --border: #374151;
+  --header-bg: transparent;
+  --badge-text: #fff;
+}
+
+/* ===== BASE STYLES ===== */
+body {
   margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body.dark{
-  --bg:#0f172a; --card:#1e293b; --text:#e5e7eb; --muted:#9ca3af;
-  --pagi:#92400e; --sore:#075985; --malam:#374151; --libur:#065f46;
-  --today:#38bdf822; --select:#fff;
-  --accent:#60a5fa; --accent-gradient:linear-gradient(to right, #60a5fa, #a78bfa);
-}
-  html, body{
-  width: 100%;
-  height: 100%;
+  font-family: system-ui, -apple-system, sans-serif;
   background: var(--bg);
-  overflow-x: hidden;
-}
-body{
-  margin:0; font-family:system-ui,sans-serif;
-  background:var(--bg);
-  color:var(--text); 
-  transition:.3s;
+  background-image: var(--theme-bg);
+  color: var(--text);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 100vh;
 }
 
-/* Fullscreen mode styles */
+/* Fullscreen mode */
 body:fullscreen {
   background: var(--bg);
   padding: 20px;
@@ -46,81 +163,192 @@ body:fullscreen .container {
   max-width: 95%;
   margin: auto;
 }
-body:fullscreen .card {
-  border-radius: 8px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-}
 
-body:fullscreen table {
-  font-size: 14px;
-}
-
-body:fullscreen .badge {
-  width: 80px;
-  padding: 6px 0;
-}
-
-body:fullscreen .controls {
-  margin-bottom: 15px;
-}
-
-body:-webkit-full-screen {
-  background: var(--bg);
+.container {
+  max-width: 920px;
+  margin: auto;
   padding: 20px;
 }
 
-body:-webkit-full-screen .container {
-  max-width: 95%;
-  margin: auto;
+/* ===== HEADER STYLES ===== */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px 20px;
+  background: var(--header-bg);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
 }
 
-.container{
-  width:100%;
-  max-width:1200px;
-  height:100vh;
-  margin:auto;
-  padding:16px;
-  display:flex;
-  flex-direction:column;
-}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
-h1{font-size:20px;margin:0;}
-.sub{color:var(--muted);font-size:13px;}
-
-.card{background:var(--card);
-  border-radius:14px;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
-  padding:14px;
-  flex:1;
-  display:flex;
-  flex-direction:column;
+header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-gradient);
 }
 
-.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;justify-content:center;align-items:center;
+.header-left h1 {
+  font-size: 24px;
+  margin: 0;
+  background: linear-gradient(135deg, var(--accent), var(--text));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+  color: #fff !important;
 }
-input,button,select{padding:7px 10px;border-radius:10px;border:1px solid #cbd5e1;background:transparent;color:var(--text);cursor:pointer;}
-button.primary{background:#2563eb;color:#fff;border:none;}
-button.primary:hover{background:#1d4ed8;}
 
-table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;flex:1;}
-th,td{padding:8px;text-align:center;border-bottom:1px solid #e5e7eb33;}
-th{color:var(--muted);}
-tr.today{background:var(--today);}
+.sub {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 4px;
+}
 
-/* ==== STYLE BARU UNTUK SELECTED ROW ==== */
+.header-right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* ===== CARD STYLES ===== */
+.card {
+  background: var(--card);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 25px;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--accent-gradient);
+}
+
+/* ===== CONTROLS ===== */
+.controls {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-bottom: 25px;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  background: rgba(0,0,0,0.02);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+body.dark .controls {
+  background: rgba(255,255,255,0.02);
+}
+
+input, button, select {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+input:hover, button:hover, select:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+button.primary {
+  background: var(--accent-gradient);
+  color: white;
+  border: none;
+  font-weight: 700;
+}
+
+button.primary:hover {
+  background: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(var(--accent-rgb, 59,130,246), 0.3);
+}
+
+/* ===== THEME SELECTOR ===== */
+.theme-selector {
+  position: relative;
+  min-width: 160px;
+}
+
+.theme-selector select {
+  width: 100%;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+/* ===== TABLE STYLES ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  table-layout: fixed;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 12px 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  color: var(--muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  background: rgba(0,0,0,0.02);
+}
+
+body.dark th {
+  background: rgba(255,255,255,0.02);
+}
+
+tr.today {
+  background: var(--today);
+  position: relative;
+}
+
+/* ===== SELECTED ROW STYLES ===== */
 tr.selected {
   position: relative;
-  background: linear-gradient(90deg, transparent 0%, rgba(37, 99, 235, 0.08) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(var(--accent-rgb, 59,130,246), 0.15) 50%, transparent 100%);
   box-shadow: 
-    inset 0 2px 12px rgba(37, 99, 235, 0.1),
-    inset 0 -2px 12px rgba(37, 99, 235, 0.1);
+    inset 0 2px 12px rgba(var(--accent-rgb, 59,130,246), 0.1),
+    inset 0 -2px 12px rgba(var(--accent-rgb, 59,130,246), 0.1);
 }
 
 tr.selected td {
   position: relative;
 }
 
-/* Garis samping kiri yang aesthetic */
 tr.selected td:first-child::before {
   content: '';
   position: absolute;
@@ -131,19 +359,14 @@ tr.selected td:first-child::before {
   height: 70%;
   background: var(--accent-gradient);
   border-radius: 2px;
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 12px var(--accent);
 }
 
-/* Efek pada badge di row terpilih */
 tr.selected .badge {
-  transform: scale(1.05);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease;
-  position: relative;
-  z-index: 1;
+  transform: scale(1.08);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Efek hover yang smooth */
 tr:not(.selected):hover {
   background: rgba(0, 0, 0, 0.04);
   transition: background 0.2s ease;
@@ -154,240 +377,356 @@ body.dark tr:not(.selected):hover {
   background: rgba(255, 255, 255, 0.06);
 }
 
-/* Animation subtle untuk selected row */
-@keyframes gentleGlow {
-  0% { background: linear-gradient(90deg, transparent 0%, rgba(37, 99, 235, 0.06) 50%, transparent 100%); }
-  50% { background: linear-gradient(90deg, transparent 0%, rgba(37, 99, 235, 0.12) 50%, transparent 100%); }
-  100% { background: linear-gradient(90deg, transparent 0%, rgba(37, 99, 235, 0.06) 50%, transparent 100%); }
-}
-
-tr.selected {
-  animation: gentleGlow 4s ease-in-out infinite;
-}
-
-/* ==== END STYLE BARU ==== */
-
-.badge{display:inline-block;width:70px;text-align:center;padding:4px 0;border-radius:999px;font-weight:600;font-size:12px;transition:all 0.2s ease;}
-.pagi{background:var(--pagi);}
-.sore{background:var(--sore);}
-.malam{background:var(--malam);}
-.libur{background:var(--libur);}
-.sunday{color:#ef4444;}
-.holiday-note{display:block;font-size:11px;color:#ef4444;}
-/* Garis vertikal tanggal & jadwal */
-table td:first-child{border-right:2px solid var(--muted);padding-right:12px;}
-
-/* Mobile fix */
-@media (max-width:768px){
-  .card{padding:12px;}
-  table td:first-child{min-width:80px;padding-right:10px;}
-  .badge{width:58px;font-size:11px;}
-  th,td{padding:6px 3px;}
-  tr.selected td:first-child::before {
-    width: 3px;
-    left: -1px;
-  }
-  .table-wrap{
-  flex:1;
-  overflow:hidden; /* penting: no scroll */
-}
-  .controls {
-  gap: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.controls-row {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-input[type="month"] {
-  min-width: 220px;     /* INI KUNCI */
-  padding: 10px 25px 10px 14px;
-  font-size: 15px;
-  font-weight: 400;
+/* ===== BADGE STYLES ===== */
+.badge {
+  display: inline-block;
+  width: 75px;
   text-align: center;
-  flex: 0 0 auto;       /* JANGAN DIKECILKAN FLEX */
+  padding: 8px 0;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--badge-text);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  letter-spacing: 0.3px;
 }
-.controls-row.bottom button {
-  min-width: 140px;
+
+.pagi {
+  background: var(--pagi);
+  box-shadow: 0 4px 12px rgba(253, 230, 138, 0.4);
 }
-  .controls button {
-    padding: 6px 8px;
-    font-size: 13px;
+
+.sore {
+  background: var(--sore);
+  box-shadow: 0 4px 12px rgba(186, 230, 253, 0.4);
+}
+
+.malam {
+  background: var(--malam);
+  box-shadow: 0 4px 12px rgba(209, 213, 219, 0.4);
+}
+
+.libur {
+  background: var(--libur);
+  box-shadow: 0 4px 12px rgba(249, 168, 212, 0.4);
+}
+
+/* ===== DATE CELL STYLES ===== */
+table td:first-child {
+  border-right: 3px solid var(--accent);
+  padding-right: 15px;
+  font-weight: 700;
+  text-align: left;
+  min-width: 90px;
+}
+
+.sunday {
+  color: #ef4444 !important;
+  font-weight: 800;
+}
+
+.holiday-note {
+  display: block;
+  font-size: 11px;
+  color: #ef4444;
+  margin-top: 4px;
+  font-style: italic;
+  font-weight: 600;
+}
+
+/* ===== MODAL STYLES ===== */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: var(--card);
+  padding: 30px;
+  border-radius: 20px;
+  min-width: 300px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.modal-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--accent-gradient);
+  border-radius: 20px 20px 0 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .container {
+    padding: 12px;
+  }
+  
+  header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .header-right {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .controls {
+    gap: 8px;
+  }
+  
+  .card {
+    padding: 16px;
+  }
+  
+  table {
+    font-size: 12px;
+  }
+  
+  th, td {
+    padding: 8px 4px;
+  }
+  
+  .badge {
+    width: 60px;
+    padding: 6px 0;
+    font-size: 11px;
+  }
+  
+  table td:first-child {
+    min-width: 70px;
+    padding-right: 8px;
   }
 }
 
-/* Modal Warna */
-#colorModal {
-  z-index: 1000;
-}
-tbody tr{
-  height: calc((100vh - 220px) / 31);
-}
-/* ===== FULLSCREEN = MODE CETAK ===== */
-body:fullscreen table,
-body:-webkit-full-screen table{
-  font-size:12px;
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-body:fullscreen .badge,
-body:-webkit-full-screen .badge{
-  width:90px;
-  padding:6px 0;
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(var(--accent-rgb, 59,130,246), 0.3); }
+  50% { box-shadow: 0 0 30px rgba(var(--accent-rgb, 59,130,246), 0.5); }
+}
+
+.card {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.primary {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* ===== THEME PREVIEW IN SELECT ===== */
+.theme-selector option[value="default"] {
+  background: linear-gradient(135deg, #f2f4f7, #fff);
+  color: #1f2937;
+}
+
+.theme-selector option[value="lebaran"] {
+  background: linear-gradient(135deg, #38a169, #2f855a);
+  color: white;
+}
+
+.theme-selector option[value="natal"] {
+  background: linear-gradient(135deg, #e53e3e, #c53030);
+  color: white;
+}
+
+.theme-selector option[value="halloween"] {
+  background: linear-gradient(135deg, #ed8936, #dd6b20);
+  color: white;
+}
+
+.theme-selector option[value="luar-angkasa"] {
+  background: linear-gradient(135deg, #1e40af, #1e3a8a);
+  color: white;
+}
+
+.theme-selector option[value="musim-salju"] {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+}
+
+.theme-selector option[value="dark"] {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  color: white;
+}
+.calendar-icon {
+  -webkit-text-fill-color: initial;
+  background: none;
+  color: var(--muted);
+  margin-right: 6px;
+}
+header .sub {
+  color: white;
+  opacity: 0.85;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  font-weight: 600;
 }
 </style>
 </head>
 <body>
 <div class="container">
 <header>
-  <div>
-    <h1>📅 Jadwal Kerja Shift</h1>
+  <div class="header-left">
+    <h1>
+  <span class="calendar-icon">📅</span>
+  Jadwal Kerja Shift 4 Grup
+   </h1>
     <div class="sub" id="monthLabel"></div>
   </div>
-  <div style="display:flex;gap:8px;">
-    <button id="fullscreenToggle" aria-label="Toggle fullscreen" title="Fullscreen (F11)">⛶</button>
-    <button id="darkToggle" aria-label="Toggle dark mode" title="Dark Mode (Ctrl+D)">🌙</button>
+  <div class="header-right">
+    <!-- Theme Selector -->
+    <div class="theme-selector">
+      <select id="themeSelect" title="Pilih tema">
+        <option value="" disabled selected>Pilih tema</option>
+        <option value="default">🎨 Default</option>
+        <option value="lebaran">🌿 Nature</option>
+        <option value="natal">🎄 Christmas</option>
+        <option value="halloween">🎃 Halloween</option>
+        <option value="luar-angkasa">🚀 Space</option>
+        <option value="musim-salju">❄️ Winter</option>
+        <option value="dark">🌙 Dark Mode</option>
+      </select>
+    </div>
+    
+    <button id="fullscreenToggle" aria-label="Toggle fullscreen" title="Fullscreen">⛶</button>    
+    <button id="darkToggle" aria-label="Toggle dark mode" title="Toggle Dark Mode">🌙</button>
   </div>
 </header>
+
 <div class="card">
 <div class="controls">
-
-  <!-- BARIS ATAS -->
-  <div class="controls-row">
-    <button id="prev" title="Bulan sebelumnya">⬅️</button>
-    <input type="month" id="monthPicker">
-    <button id="next" title="Bulan berikutnya">➡️</button>
-  </div>
-
-  <!-- BARIS BAWAH -->
-  <div class="controls-row bottom">
-    <button onclick="openShiftModal()">⚙️ Custom Shift</button>
-    <button id="colorBtn">🎨 Kustomisasi Warna</button>
-    <button class="primary" onclick="exportToPDF()">🖨️ Cetak / PDF</button>
-  </div>
-
+  <button id="prev" title="Bulan sebelumnya (←)">⬅️ Prev</button>
+  <input type="month" id="monthPicker" title="Pilih bulan">
+  <button id="next" title="Bulan berikutnya (→)">Next ➡️</button>
+  <button onclick="openShiftModal()" title="Atur shift hari ini">⚙️ Custom Shift</button>
+  <button class="primary" onclick="exportToPDF()" title="Cetak jadwal">🖨️ Cetak / PDF</button>
 </div>
-<div class="table-wrap">
+
 <table>
 <thead>
 <tr>
-  <th>Tanggal</th><th>A</th><th>B</th><th>C</th><th>D</th>
+  <th>Tanggal</th>
+  <th>Grup A</th>
+  <th>Grup B</th>
+  <th>Grup C</th>
+  <th>Grup D</th>
 </tr>
 </thead>
-<tbody id="tableBody"></tbody>
+<tbody id="tableBody">
+  <!-- Jadwal akan diisi oleh JavaScript -->
+</tbody>
 </table>
 </div>
 </div>
-</div>
 
-<!-- Modal Warna -->
-<div id="colorModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#00000055;justify-content:center;align-items:center;z-index:1000;">
-<div style="background:var(--card);padding:20px;border-radius:14px;min-width:250px;max-width:90%;">
-<h3 style="margin:0 0 15px 0;">Kustomisasi Warna Shift</h3>
-<div style="display:flex;flex-direction:column;gap:10px;margin-top:10px;">
-<label style="display:flex;justify-content:space-between;align-items:center;">Pagi <input type="color" id="colorPagi"></label>
-<label style="display:flex;justify-content:space-between;align-items:center;">Sore <input type="color" id="colorSore"></label>
-<label style="display:flex;justify-content:space-between;align-items:center;">Malam <input type="color" id="colorMalam"></label>
-<label style="display:flex;justify-content:space-between;align-items:center;">Libur <input type="color" id="colorLibur"></label>
-</div>
-<div style="margin-top:18px;display:flex;justify-content:space-between;">
-<button id="resetColors">Reset</button>
-<div style="display:flex;gap:8px;">
-<button id="cancelModal">Batal</button>
-<button id="saveColors" class="primary">Simpan</button>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Modal Setting Shift Hari Ini -->
-<div id="shiftModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#00000055;justify-content:center;align-items:center;z-index:1000;">
-  <div style="background:var(--card);padding:24px;border-radius:14px;min-width:320px;max-width:90%;">
-    <h3 style="margin:0 0 15px 0;display:flex;align-items:center;gap:8px;">⚙️ Pengaturan Shift </h3>
-    
-    <div style="background:var(--today);padding:10px 14px;border-radius:8px;margin-bottom:15px;font-size:13px;" id="shiftInfo">
-      <strong>Atur shift hari ini:</strong> <span id="todayDateLabel">Jumat, 26 Desember 2025</span>
-    </div>
-    
-    <div style="display:grid;gap:12px;margin-top:10px;">
-      <label style="display:flex;justify-content:space-between;align-items:center;">
-        <span><strong>Grup A</strong></span>
-        <select id="shiftA" style="padding:6px 12px;border-radius:8px;background:var(--card);color:var(--text);min-width:140px;">
-          <option value="0">Pagi 1</option>
-          <option value="1">Pagi 2</option>
-          <option value="2">Sore 1</option>
-          <option value="3">Sore 2</option>
-          <option value="4">Malam 1</option>
-          <option value="5">Malam 2</option>
-          <option value="6">Libur 1</option>
-          <option value="7">Libur 2</option>
-        </select>
-      </label>
-      <label style="display:flex;justify-content:space-between;align-items:center;">
-        <span><strong>Grup B</strong></span>
-        <select id="shiftB" style="padding:6px 12px;border-radius:8px;background:var(--card);color:var(--text);min-width:140px;">
-          <option value="0">Pagi 1</option>
-          <option value="1">Pagi 2</option>
-          <option value="2">Sore 1</option>
-          <option value="3">Sore 2</option>
-          <option value="4">Malam 1</option>
-          <option value="5">Malam 2</option>
-          <option value="6">Libur 1</option>
-          <option value="7">Libur 2</option>
-        </select>
-      </label>
-      <label style="display:flex;justify-content:space-between;align-items:center;">
-        <span><strong>Grup C</strong></span>
-        <select id="shiftC" style="padding:6px 12px;border-radius:8px;background:var(--card);color:var(--text);min-width:140px;">
-          <option value="0">Pagi 1</option>
-          <option value="1">Pagi 2</option>
-          <option value="2">Sore 1</option>
-          <option value="3">Sore 2</option>
-          <option value="4">Malam 1</option>
-          <option value="5">Malam 2</option>
-          <option value="6">Libur 1</option>
-          <option value="7">Libur 2</option>
-        </select>
-      </label>
-      <label style="display:flex;justify-content:space-between;align-items:center;">
-        <span><strong>Grup D</strong></span>
-        <select id="shiftD" style="padding:6px 12px;border-radius:8px;background:var(--card);color:var(--text);min-width:140px;">
-          <option value="0">Pagi 1</option>
-          <option value="1">Pagi 2</option>
-          <option value="2">Sore 1</option>
-          <option value="3">Sore 2</option>
-          <option value="4">Malam 1</option>
-          <option value="5">Malam 2</option>
-          <option value="6">Libur 1</option>
-          <option value="7">Libur 2</option>
-        </select>
-      </label>
-    </div>
-    
-    <div style="margin-top:20px;padding-top:15px;border-top:1px solid rgba(0,0,0,0.1);">
-      <div style="display:flex;justify-content:space-between;">
-        <button onclick="closeShiftModal()">Batal</button>
-        <div style="display:flex;gap:8px;">
-          <button onclick="resetShiftToDefault()" style="background:transparent;border:1px solid var(--muted);">Reset ke Default</button>
-          <button class="primary" onclick="saveShift()">Simpan Setting</button>
-        </div>
+<!-- Modal Setting Shift -->
+<div id="shiftModal" class="modal">
+<div class="modal-content">
+  <h3 style="margin:0 0 15px 0;display:flex;align-items:center;gap:10px;">⚙️ Pengaturan Shift</h3>
+  
+  <div style="background:var(--today);padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:14px;" id="shiftInfo">
+    <strong>📅 Atur shift untuk:</strong> <span id="todayDateLabel">Hari ini</span>
+  </div>
+  
+  <!-- Shift Inputs untuk sistem biasa -->
+  <div style="display:grid;gap:15px;margin-top:10px;">
+    <label style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-weight:700;">👥 Grup A</span>
+      <select id="shiftA" style="padding:8px 12px;border-radius:10px;background:var(--card);color:var(--text);min-width:150px;border:2px solid var(--border);">
+        <option value="0">Pagi 1</option>
+        <option value="1">Pagi 2</option>
+        <option value="2">Sore 1</option>
+        <option value="3">Sore 2</option>
+        <option value="4">Malam 1</option>
+        <option value="5">Malam 2</option>
+        <option value="6">Libur 1</option>
+        <option value="7">Libur 2</option>
+      </select>
+    </label>
+    <label style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-weight:700;">👥 Grup B</span>
+      <select id="shiftB" style="padding:8px 12px;border-radius:10px;background:var(--card);color:var(--text);min-width:150px;border:2px solid var(--border);">
+        <option value="0">Pagi 1</option>
+        <option value="1">Pagi 2</option>
+        <option value="2">Sore 1</option>
+        <option value="3">Sore 2</option>
+        <option value="4">Malam 1</option>
+        <option value="5">Malam 2</option>
+        <option value="6">Libur 1</option>
+        <option value="7">Libur 2</option>
+      </select>
+    </label>
+    <label style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-weight:700;">👥 Grup C</span>
+      <select id="shiftC" style="padding:8px 12px;border-radius:10px;background:var(--card);color:var(--text);min-width:150px;border:2px solid var(--border);">
+        <option value="0">Pagi 1</option>
+        <option value="1">Pagi 2</option>
+        <option value="2">Sore 1</option>
+        <option value="3">Sore 2</option>
+        <option value="4">Malam 1</option>
+        <option value="5">Malam 2</option>
+        <option value="6">Libur 1</option>
+        <option value="7">Libur 2</option>
+      </select>
+    </label>
+    <label style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-weight:700;">👥 Grup D</span>
+      <select id="shiftD" style="padding:8px 12px;border-radius:10px;background:var(--card);color:var(--text);min-width:150px;border:2px solid var(--border);">
+        <option value="0">Pagi 1</option>
+        <option value="1">Pagi 2</option>
+        <option value="2">Sore 1</option>
+        <option value="3">Sore 2</option>
+        <option value="4">Malam 1</option>
+        <option value="5">Malam 2</option>
+        <option value="6">Libur 1</option>
+        <option value="7">Libur 2</option>
+      </select>
+    </label>
+  </div>
+  
+  <div style="margin-top:25px;padding-top:20px;border-top:2px solid var(--border);">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <button onclick="closeShiftModal()">❌ Batal</button>
+      <div style="display:flex;gap:10px;">
+        <button onclick="resetShiftToDefault()" style="background:transparent;border:2px solid var(--border);">🔄 Reset ke Default</button>
+        <button class="primary" onclick="saveShift()">💾 Simpan Setting</button>
       </div>
     </div>
   </div>
 </div>
+</div>
 
 <script>
 // ===== KONSTANTA & VARIABEL =====
-const START_DATE = new Date(2025, 11, 22); // 22 Desember 2025
+const START_DATE = new Date(2025, 11, 22); // 22 Desember 2025 (sistem biasa)
 const SHIFT_CYCLE = ["Pagi","Pagi","Sore","Sore","Malam","Malam","Libur","Libur"];
-const OFFSETS = { A: 6, B: 4, C: 2, D: 0 }; // Offset default
+const OFFSETS = { A: 6, B: 4, C: 2, D: 0 }; // Offset sistem biasa
 
-// Hitung default shift dari START_DATE
+// Hitung default shift dari START_DATE (sistem biasa)
 function calculateDefaultShift() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -411,32 +750,12 @@ function calculateDefaultShift() {
   return result;
 }
 
-// Setting awal (dihitung dari START_DATE)
-let BASE_SHIFT = JSON.parse(localStorage.getItem("baseShift")) || calculateDefaultShift();
-
 // ===== VARIABEL =====
 let currentYear, currentMonth, HOLIDAYS = {}, scrolled = false, selectedDateKey = null;
 let renderTimeout = null;
+let BASE_SHIFT = JSON.parse(localStorage.getItem("baseShift")) || calculateDefaultShift();
 
-// ===== ELEMENTS =====
-const tableBody = document.getElementById("tableBody");
-const monthPicker = document.getElementById("monthPicker");
-const monthLabel = document.getElementById("monthLabel");
-const darkToggle = document.getElementById("darkToggle");
-const colorBtn = document.getElementById("colorBtn");
-const colorModal = document.getElementById("colorModal");
-const colorPagi = document.getElementById("colorPagi");
-const colorSore = document.getElementById("colorSore");
-const colorMalam = document.getElementById("colorMalam");
-const colorLibur = document.getElementById("colorLibur");
-const resetColors = document.getElementById("resetColors");
-const cancelModal = document.getElementById("cancelModal");
-const saveColors = document.getElementById("saveColors");
-const fullscreenToggle = document.getElementById("fullscreenToggle");
-const shiftModal = document.getElementById("shiftModal");
-const todayDateLabel = document.getElementById("todayDateLabel");
-
-// ===== FUNGSI UTAMA: HITUNG SHIFT =====
+// ===== FUNGSI UTAMA: HITUNG SHIFT (SISTEM BIASA) =====
 function getShiftForDate(grup, targetDate) {
   // 1. Tentukan shift grup pada HARI INI (dari BASE_SHIFT)
   const todayShiftIndex = BASE_SHIFT[grup];
@@ -451,12 +770,76 @@ function getShiftForDate(grup, targetDate) {
   const diffMs = target - today;
   const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
   
-  // 3. Hitung shift index untuk tanggal target
+  // 3. Hitung shift index untuk tanggal target (sistem biasa: berubah setiap hari)
   let targetIndex = (todayShiftIndex + diffDays) % 8;
   if (targetIndex < 0) targetIndex += 8;
   
   // 4. Ambil label dari SHIFT_CYCLE
   return SHIFT_CYCLE[targetIndex];
+}
+
+// ===== THEME FUNCTIONS =====
+function initTheme() {
+  const savedTheme = localStorage.getItem("shiftTheme") || "default";
+  
+  // Remove all theme classes
+  document.body.classList.remove("theme-lebaran", "theme-natal", "theme-halloween", 
+                                "theme-luar-angkasa", "theme-musim-salju", "dark");
+  
+  // Apply saved theme
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark");
+    themeSelect.value = "dark";
+  } else if (savedTheme !== "default") {
+    document.body.classList.add(`theme-${savedTheme}`);
+    themeSelect.value = savedTheme;
+  } else {
+    themeSelect.value = "default";
+  }
+  
+  // Update UI
+  updateThemePreview();
+}
+
+function changeTheme(theme) {
+  // Remove all theme classes
+  document.body.classList.remove("theme-lebaran", "theme-natal", "theme-halloween", 
+                                "theme-luar-angkasa", "theme-musim-salju", "dark");
+  
+  // Apply new theme
+  if (theme === "dark") {
+    document.body.classList.add("dark");
+  } else if (theme !== "default") {
+    document.body.classList.add(`theme-${theme}`);
+  }
+  
+  // Save to localStorage
+  localStorage.setItem("shiftTheme", theme);
+  
+  // Update UI
+  updateThemePreview();
+  
+  // Add animation effect
+  document.body.style.opacity = "0.8";
+  setTimeout(() => {
+    document.body.style.opacity = "1";
+  }, 200);
+}
+
+function updateThemePreview() {
+  const currentTheme = localStorage.getItem("shiftTheme") || "default";
+  const themeNames = {
+    "default": "🎨 Default",
+    "lebaran": "🕌 Lebaran",
+    "natal": "🎄 Natal", 
+    "halloween": "🎃 Halloween",
+    "luar-angkasa": "🚀 Luar Angkasa",
+    "musim-salju": "❄️ Musim Salju",
+    "dark": "🌙 Dark Mode"
+  };
+  
+  // Update document title with theme
+  document.title = `Jadwal Shift Premium - ${themeNames[currentTheme]}`;
 }
 
 // ===== HELPER FUNCTIONS =====
@@ -465,7 +848,10 @@ function dateKey(d) {
 }
 
 function updateMonthLabel() {
-  const monthName = new Date(currentYear, currentMonth).toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+  const monthName = new Date(currentYear, currentMonth).toLocaleDateString("id-ID", { 
+    month: "long", 
+    year: "numeric" 
+  });
   monthLabel.innerHTML = monthName;
 }
 
@@ -536,9 +922,14 @@ function render() {
     }
     
     const tdDate = document.createElement("td");
-    tdDate.innerHTML = date.toLocaleDateString("id-ID", { weekday: "short", day: "2-digit" });
+    const dayName = date.toLocaleDateString("id-ID", { weekday: "short" });
+    const dayNumber = String(date.getDate()).padStart(2, "0");
+    tdDate.innerHTML = `<strong>${dayName}, ${dayNumber}</strong>`;
     
-    if (HOLIDAYS[key]) tdDate.innerHTML += `<span class="holiday-note">${HOLIDAYS[key]}</span>`;
+    if (HOLIDAYS[key]) {
+      tdDate.innerHTML += `<span class="holiday-note">🎉 ${HOLIDAYS[key]}</span>`;
+    }
+    
     if (date.getDay() === 0) tdDate.classList.add("sunday");
     
     tr.appendChild(tdDate);
@@ -558,12 +949,80 @@ function render() {
           behavior: 'smooth',
           block: 'center'
         });
-      }, 150);
+      }, 300);
       scrolled = true;
     }
   }
 }
 
+// ===== EVENT LISTENERS =====
+themeSelect.addEventListener("change", (e) => {
+  changeTheme(e.target.value);
+});
+
+darkToggle.addEventListener("click", () => {
+  if (document.body.classList.contains("dark")) {
+    changeTheme("default");
+  } else {
+    changeTheme("dark");
+  }
+});
+
+// ===== SHIFT MODAL FUNCTIONS =====
+function openShiftModal() {
+  updateTodayDateLabel();
+  
+  document.getElementById("shiftA").value = BASE_SHIFT.A;
+  document.getElementById("shiftB").value = BASE_SHIFT.B;
+  document.getElementById("shiftC").value = BASE_SHIFT.C;
+  document.getElementById("shiftD").value = BASE_SHIFT.D;
+  
+  shiftModal.style.display = "flex";
+}
+
+function closeShiftModal() {
+  shiftModal.style.display = "none";
+}
+
+function resetShiftToDefault() {
+  if (confirm("Reset shift ke pengaturan default?")) {
+    BASE_SHIFT = calculateDefaultShift();
+    
+    document.getElementById("shiftA").value = BASE_SHIFT.A;
+    document.getElementById("shiftB").value = BASE_SHIFT.B;
+    document.getElementById("shiftC").value = BASE_SHIFT.C;
+    document.getElementById("shiftD").value = BASE_SHIFT.D;
+    
+    localStorage.removeItem("baseShift");
+    scheduleRender();
+  }
+}
+
+function saveShift() {
+  BASE_SHIFT.A = parseInt(document.getElementById("shiftA").value);
+  BASE_SHIFT.B = parseInt(document.getElementById("shiftB").value);
+  BASE_SHIFT.C = parseInt(document.getElementById("shiftC").value);
+  BASE_SHIFT.D = parseInt(document.getElementById("shiftD").value);
+  
+  localStorage.setItem("baseShift", JSON.stringify(BASE_SHIFT));
+  closeShiftModal();
+  scheduleRender();
+}
+
+// ===== FULLSCREEN =====
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(err => {
+      console.log(`Error attempting to enable fullscreen: ${err.message}`);
+    });
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+fullscreenToggle.onclick = toggleFullscreen;
+
+// ===== EXPORT PDF (MIRIP KODE SHIFT BIASA) =====
 function exportToPDF() {
   const monthName = new Date(currentYear, currentMonth).toLocaleDateString('id-ID', {
     month: 'long',
@@ -619,8 +1078,7 @@ function exportToPDF() {
     tableHTML += '</tr>';
   }
   
-
-const printHTML = `
+  const printHTML = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -863,200 +1321,17 @@ monthPicker.onchange = e => {
   setMonth(+y, +m - 1);
 };
 
-// ===== FULLSCREEN =====
-function toggleFullscreen() {
-  if (!document.fullscreenElement) {
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen();
-    } else if (document.documentElement.webkitRequestFullscreen) {
-      document.documentElement.webkitRequestFullscreen();
-    } else if (document.documentElement.msRequestFullscreen) {
-      document.documentElement.msRequestFullscreen();
-    }
-  } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) {
-      document.msExitFullscreen();
-    }
-  }
-}
-
-fullscreenToggle.onclick = toggleFullscreen;
-
-document.addEventListener('fullscreenchange', updateFullscreenButton);
-document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
-document.addEventListener('msfullscreenchange', updateFullscreenButton);
-
-function updateFullscreenButton() {
-  if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
-    fullscreenToggle.innerHTML = '🚫';
-    fullscreenToggle.title = 'Keluar Fullscreen (F11)';
-  } else {
-    fullscreenToggle.innerHTML = '⛶';
-    fullscreenToggle.title = 'Fullscreen (F11)';
-  }
-}
-
-// ===== DARK MODE =====
-if (localStorage.getItem("dark") === "1") document.body.classList.add("dark");
-darkToggle.onclick = () => {
-  document.body.classList.toggle("dark");
-  localStorage.setItem("dark", document.body.classList.contains("dark") ? "1" : "0");
-};
-
-// ===== COLOR MODAL =====
-colorBtn.onclick = () => {
-  colorModal.style.display = "flex";
-  loadSavedColors();
-};
-
-cancelModal.onclick = () => {
-  colorModal.style.display = "none";
-};
-
-function loadSavedColors() {
-  colorPagi.value = localStorage.getItem("colorPagi") || "#fde68a";
-  colorSore.value = localStorage.getItem("colorSore") || "#bae6fd";
-  colorMalam.value = localStorage.getItem("colorMalam") || "#d1d5db";
-  colorLibur.value = localStorage.getItem("colorLibur") || "#f9a8d4";
-}
-
-resetColors.onclick = () => {
-  if (confirm("Yakin ingin mengembalikan warna ke default? Semua warna kustom akan dihapus.")) {
-    localStorage.removeItem("colorPagi");
-    localStorage.removeItem("colorSore");
-    localStorage.removeItem("colorMalam");
-    localStorage.removeItem("colorLibur");
-    loadSavedColors();
-    saveColors.click();
-  }
-};
-
-saveColors.onclick = () => {
-  localStorage.setItem("colorPagi", colorPagi.value);
-  localStorage.setItem("colorSore", colorSore.value);
-  localStorage.setItem("colorMalam", colorMalam.value);
-  localStorage.setItem("colorLibur", colorLibur.value);
-  applyColors();
-  colorModal.style.display = "none";
-};
-
-function applyColors() {
-  document.documentElement.style.setProperty("--pagi", localStorage.getItem("colorPagi") || "#fde68a");
-  document.documentElement.style.setProperty("--sore", localStorage.getItem("colorSore") || "#bae6fd");
-  document.documentElement.style.setProperty("--malam", localStorage.getItem("colorMalam") || "#d1d5db");
-  document.documentElement.style.setProperty("--libur", localStorage.getItem("colorLibur") || "#f9a8d4");
-}
-
-applyColors();
-
-// ===== SHIFT MODAL FUNCTIONS =====
-function openShiftModal() {
-  updateTodayDateLabel();
-  
-  // Set dropdown sesuai setting saat ini
-  document.getElementById("shiftA").value = BASE_SHIFT.A;
-  document.getElementById("shiftB").value = BASE_SHIFT.B;
-  document.getElementById("shiftC").value = BASE_SHIFT.C;
-  document.getElementById("shiftD").value = BASE_SHIFT.D;
-  
-  shiftModal.style.display = "flex";
-}
-
-function closeShiftModal() {
-  shiftModal.style.display = "none";
-}
-
-function resetShiftToDefault() {
-  if (confirm("Reset shift ke pengaturan default?")) {
-    // Hitung ulang default shift dari START_DATE
-    BASE_SHIFT = calculateDefaultShift();
-    
-    // Update dropdown
-    document.getElementById("shiftA").value = BASE_SHIFT.A;
-    document.getElementById("shiftB").value = BASE_SHIFT.B;
-    document.getElementById("shiftC").value = BASE_SHIFT.C;
-    document.getElementById("shiftD").value = BASE_SHIFT.D;
-    
-    // Hapus dari localStorage (biar pakai default)
-    localStorage.removeItem("baseShift");
-    
-    // Render ulang
-    scheduleRender();
-  }
-}
-
-function saveShift() {
-  BASE_SHIFT.A = parseInt(document.getElementById("shiftA").value);
-  BASE_SHIFT.B = parseInt(document.getElementById("shiftB").value);
-  BASE_SHIFT.C = parseInt(document.getElementById("shiftC").value);
-  BASE_SHIFT.D = parseInt(document.getElementById("shiftD").value);
-  
-  localStorage.setItem("baseShift", JSON.stringify(BASE_SHIFT));
-  closeShiftModal();
-  scheduleRender();
-}
+// ===== START APPLICATION =====
+const now = new Date();
+setMonth(now.getFullYear(), now.getMonth());
+initTheme();
 
 shiftModal.addEventListener("click", function (e) {
   if (e.target === shiftModal) closeShiftModal();
 });
 
-// ===== KEYBOARD NAVIGATION =====
-document.addEventListener('keydown', function (e) {
-  if (e.key === 'ArrowLeft' && !e.ctrlKey && !e.altKey) {
-    e.preventDefault();
-    document.getElementById('prev').click();
-  }
-  
-  if (e.key === 'ArrowRight' && !e.ctrlKey && !e.altKey) {
-    e.preventDefault();
-    document.getElementById('next').click();
-  }
-  
-  if (e.key === 'Escape' && selectedDateKey) {
-    selectedDateKey = null;
-    scheduleRender();
-  }
-  
-  if (e.key === 'F11') {
-    e.preventDefault();
-    toggleFullscreen();
-  }
-  
-  if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
-    e.preventDefault();
-    exportToPDF();
-  }
-  
-  if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
-    e.preventDefault();
-    darkToggle.click();
-  }
-  
-  if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-    e.preventDefault();
-    colorBtn.click();
-  }
-  
-  if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-    e.preventDefault();
-    toggleFullscreen();
-  }
-  
-  // Ctrl+S untuk buka setting shift
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-    e.preventDefault();
-    openShiftModal();
-  }
-});
-
-// ===== INITIALIZE =====
-const now = new Date();
-setMonth(now.getFullYear(), now.getMonth());
-// RESET SEMUA LOCALSTORAGE (PAKAI SEKALI AJA)
+// Add theme transition effect
+document.body.style.transition = "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)";
 </script>
 </body>
-</html>
+  </html>
