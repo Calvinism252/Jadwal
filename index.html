@@ -722,11 +722,11 @@ header .sub {
 
 <script>
 // ===== KONSTANTA & VARIABEL =====
-const START_DATE = new Date(2025, 11, 22); // 22 Desember 2025 (sistem biasa)
+const START_DATE = new Date(2025, 11, 22); // 22 Desember 2025
 const SHIFT_CYCLE = ["Pagi","Pagi","Sore","Sore","Malam","Malam","Libur","Libur"];
-const OFFSETS = { A: 6, B: 4, C: 2, D: 0 }; // Offset sistem biasa
+const OFFSETS = { A: 6, B: 4, C: 2, D: 0 }; // Offset default
 
-// Hitung default shift dari START_DATE (sistem biasa)
+// Hitung default shift dari START_DATE
 function calculateDefaultShift() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -750,12 +750,13 @@ function calculateDefaultShift() {
   return result;
 }
 
+// Setting awal (dihitung dari START_DATE)
+let BASE_SHIFT = JSON.parse(localStorage.getItem("baseShift")) || calculateDefaultShift();
+
 // ===== VARIABEL =====
 let currentYear, currentMonth, HOLIDAYS = {}, scrolled = false, selectedDateKey = null;
 let renderTimeout = null;
-let BASE_SHIFT = JSON.parse(localStorage.getItem("baseShift")) || calculateDefaultShift();
-
-// ===== FUNGSI UTAMA: HITUNG SHIFT (SISTEM BIASA) =====
+// ===== FUNGSI UTAMA: HITUNG SHIFT =====
 function getShiftForDate(grup, targetDate) {
   // 1. Tentukan shift grup pada HARI INI (dari BASE_SHIFT)
   const todayShiftIndex = BASE_SHIFT[grup];
@@ -770,7 +771,7 @@ function getShiftForDate(grup, targetDate) {
   const diffMs = target - today;
   const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
   
-  // 3. Hitung shift index untuk tanggal target (sistem biasa: berubah setiap hari)
+  // 3. Hitung shift index untuk tanggal target
   let targetIndex = (todayShiftIndex + diffDays) % 8;
   if (targetIndex < 0) targetIndex += 8;
   
@@ -1334,4 +1335,4 @@ shiftModal.addEventListener("click", function (e) {
 document.body.style.transition = "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)";
 </script>
 </body>
-  </html>
+</html>
