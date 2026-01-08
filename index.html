@@ -723,10 +723,10 @@ header .sub {
 <script>
 // ===== KONSTANTA & VARIABEL =====
 const START_DATE = new Date(2025, 11, 22); // 22 Desember 2025
-const SHIFT_CYCLE = ["Pagi","Pagi","Sore","Sore","Malam","Malam","Libur","Libur"];
-const OFFSETS = { A: 6, B: 4, C: 2, D: 0 }; // Offset default
+const SHIFT_CYCLE = ["Pagi", "Pagi", "Sore", "Sore", "Malam", "Malam", "Libur", "Libur"];
+const OFFSETS = { A: 6, B: 4, C: 2, D: 0 }; // Offset untuk 22 Des 2025
 
-// Hitung default shift dari START_DATE
+// Hitung default shift dari START_DATE untuk hari ini
 function calculateDefaultShift() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -735,16 +735,17 @@ function calculateDefaultShift() {
   startDate.setHours(0, 0, 0, 0);
   
   // Hitung selisih hari dari START_DATE ke hari ini
-  const diffMs = today - startDate;
-  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-  
-  // Hitung posisi di siklus 8-hari
-  const cyclePosition = ((diffDays % 8) + 8) % 8;
+  const diffMs = today.getTime() - startDate.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   
   // Hitung shift index untuk tiap grup
   const result = {};
   ["A", "B", "C", "D"].forEach(grup => {
-    result[grup] = (cyclePosition + OFFSETS[grup]) % 8;
+    // Formula: (offset_grup + diffDays) % 8
+    let shiftIndex = (OFFSETS[grup] + diffDays) % 8;
+    if (shiftIndex < 0) shiftIndex += 8;
+    
+    result[grup] = shiftIndex;
   });
   
   return result;
@@ -753,30 +754,57 @@ function calculateDefaultShift() {
 // Setting awal (dihitung dari START_DATE)
 let BASE_SHIFT = JSON.parse(localStorage.getItem("baseShift")) || calculateDefaultShift();
 
-// ===== VARIABEL =====
-let currentYear, currentMonth, HOLIDAYS = {}, scrolled = false, selectedDateKey = null;
-let renderTimeout = null;
 // ===== FUNGSI UTAMA: HITUNG SHIFT =====
 function getShiftForDate(grup, targetDate) {
-  // 1. Tentukan shift grup pada HARI INI (dari BASE_SHIFT)
-  const todayShiftIndex = BASE_SHIFT[grup];
+  // Jika BASE_SHIFT tersimpan di localStorage, gunakan itu sebagai patokan
+  // Jika tidak, hitung langsung dari START_DATE
   
-  // 2. Hitung selisih hari antara targetDate dengan hari ini
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  const target = new Date(targetDate);
-  target.setHours(0, 0, 0, 0);
-  
-  const diffMs = target - today;
-  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-  
-  // 3. Hitung shift index untuk tanggal target
-  let targetIndex = (todayShiftIndex + diffDays) % 8;
-  if (targetIndex < 0) targetIndex += 8;
-  
-  // 4. Ambil label dari SHIFT_CYCLE
-  return SHIFT_CYCLE[targetIndex];
+  if (Object.keys(BASE_SHIFT).length > 0 && 
+      localStorage.getItem("baseShift") !== null) {
+    // Mode: gunakan BASE_SHIFT sebagai patokan (Custom Shift)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const target = new Date(targetDate);
+    target.setHours(0, 0, 0, 0);
+    
+    // Hitung selisih hari antara targetDate dengan hari ini
+    const diffMs = target.getTime() - today.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    // Hitung shift index untuk tanggal target
+    let targetIndex = (BASE_SHIFT[grup] + diffDays) % 8;
+    if (targetIndex < 0) targetIndex += 8;
+    
+    // Tentukan apakah "pertama" atau "kedua"
+    const shiftType = SHIFT_CYCLE[targetIndex];
+    const firstIndex = SHIFT_CYCLE.indexOf(shiftType);
+    const isSecond = targetIndex === firstIndex + 1;
+    
+    return isSecond ? `${shiftType} 2` : `${shiftType} 1`;
+  } else {
+    // Mode: hitung langsung dari START_DATE (Default)
+    const startDate = new Date(START_DATE);
+    startDate.setHours(0, 0, 0, 0);
+    
+    const target = new Date(targetDate);
+    target.setHours(0, 0, 0, 0);
+    
+    // Hitung selisih hari antara targetDate dengan START_DATE
+    const diffMs = target.getTime() - startDate.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    // Hitung shift index untuk tanggal target
+    let targetIndex = (OFFSETS[grup] + diffDays) % 8;
+    if (targetIndex < 0) targetIndex += 8;
+    
+    // Tentukan apakah "pertama" atau "kedua"
+    const shiftType = SHIFT_CYCLE[targetIndex];
+    const firstIndex = SHIFT_CYCLE.indexOf(shiftType);
+    const isSecond = targetIndex === firstIndex + 1;
+    
+    return isSecond ? `${shiftType} 2` : `${shiftType} 1`;
+  }
 }
 
 // ===== THEME FUNCTIONS =====
@@ -938,7 +966,8 @@ function render() {
     ["A", "B", "C", "D"].forEach(grup => {
       const td = document.createElement("td");
       const shift = getShiftForDate(grup, date);
-      td.innerHTML = `<span class="badge ${shift.toLowerCase()}">${shift}</span>`;
+      const shiftType = shift.split(" ")[0].toLowerCase();
+      td.innerHTML = `<span class="badge ${shiftType}">${shift}</span>`;
       tr.appendChild(td);
     });
     
@@ -973,6 +1002,7 @@ darkToggle.addEventListener("click", () => {
 function openShiftModal() {
   updateTodayDateLabel();
   
+  // Set nilai dropdown sesuai BASE_SHIFT
   document.getElementById("shiftA").value = BASE_SHIFT.A;
   document.getElementById("shiftB").value = BASE_SHIFT.B;
   document.getElementById("shiftC").value = BASE_SHIFT.C;
@@ -986,7 +1016,7 @@ function closeShiftModal() {
 }
 
 function resetShiftToDefault() {
-  if (confirm("Reset shift ke pengaturan default?")) {
+  if (confirm("Reset shift ke pengaturan default (berdasarkan 22 Desember 2025)?")) {
     BASE_SHIFT = calculateDefaultShift();
     
     document.getElementById("shiftA").value = BASE_SHIFT.A;
@@ -996,6 +1026,9 @@ function resetShiftToDefault() {
     
     localStorage.removeItem("baseShift");
     scheduleRender();
+    
+    // Tampilkan konfirmasi
+    alert("Shift telah direset ke pengaturan default!");
   }
 }
 
@@ -1008,6 +1041,9 @@ function saveShift() {
   localStorage.setItem("baseShift", JSON.stringify(BASE_SHIFT));
   closeShiftModal();
   scheduleRender();
+  
+  // Tampilkan konfirmasi
+  alert("Pengaturan shift berhasil disimpan!");
 }
 
 // ===== FULLSCREEN =====
@@ -1023,7 +1059,7 @@ function toggleFullscreen() {
 
 fullscreenToggle.onclick = toggleFullscreen;
 
-// ===== EXPORT PDF (MIRIP KODE SHIFT BIASA) =====
+// ===== EXPORT PDF =====
 function exportToPDF() {
   const monthName = new Date(currentYear, currentMonth).toLocaleDateString('id-ID', {
     month: 'long',
@@ -1038,14 +1074,6 @@ function exportToPDF() {
     minute: '2-digit'
   });
   
-  // Mapping untuk singkatan shift
-  const shiftMap = {
-    'Pagi': 'Pagi',
-    'Sore': 'Sore',
-    'Malam': 'Malam',
-    'Libur': 'Libur'
-  };
-  
   let tableHTML = '';
   const days = new Date(currentYear, currentMonth + 1, 0).getDate();
   const todayKey = dateKey(new Date());
@@ -1054,7 +1082,6 @@ function exportToPDF() {
     const date = new Date(currentYear, currentMonth, d);
     const key = dateKey(date);
     
-    // Format tanggal: "Sen, 01"
     const dayName = date.toLocaleDateString('id-ID', { weekday: 'short' }).replace('.', '');
     const dayNum = String(d).padStart(2, '0');
     const dateStr = `${dayName}, ${dayNum}`;
@@ -1070,10 +1097,9 @@ function exportToPDF() {
     
     ['A', 'B', 'C', 'D'].forEach(grup => {
       const shift = getShiftForDate(grup, date);
-      const singkatan = shiftMap[shift] || shift;
-      const shiftClass = shift.toLowerCase();
+      const shiftType = shift.split(' ')[0].toLowerCase();
       
-      tableHTML += `<td class="cell-${shiftClass}">${singkatan}</td>`;
+      tableHTML += `<td class="cell-${shiftType}">${shift}</td>`;
     });
     
     tableHTML += '</tr>';
@@ -1088,27 +1114,27 @@ function exportToPDF() {
   <style>
     @page {
       size: A4 portrait;
-      margin: 8mm 10mm; /* MARGIN LEBIH KECIL */
+      margin: 8mm 10mm;
     }
     
     body {
       font-family: 'Arial', sans-serif;
       margin: 0;
       padding: 0;
-      font-size: 10px; /* FONT LEBIH KECIL */
+      font-size: 10px;
       color: #000;
-      line-height: 1.1; /* LINE HEIGHT KECIL */
+      line-height: 1.1;
     }
     
     .header {
       text-align: center;
-      margin-bottom: 10px; /* MARGIN HEADER KECIL */
+      margin-bottom: 10px;
       padding-bottom: 5px;
       border-bottom: 1px solid #333;
     }
     
     .main-title {
-      font-size: 16px; /* TITLE LEBIH KECIL */
+      font-size: 16px;
       font-weight: bold;
       margin-bottom: 3px;
     }
@@ -1124,35 +1150,34 @@ function exportToPDF() {
       color: #666;
     }
     
-    /* TABEL LEBIH COMPACT */
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 9px; /* FONT TABLE LEBIH KECIL */
+      font-size: 9px;
       table-layout: fixed;
       margin-top: 5px;
     }
     
     th {
       background-color: #f2f2f2;
-      padding: 5px 3px; /* PADDING LEBIH KECIL */
+      padding: 5px 3px;
       border: 1px solid #777;
       text-align: center;
       font-weight: bold;
       font-size: 10px;
-      height: 22px; /* TINGGI HEADER KECIL */
+      height: 22px;
     }
     
     td {
-      padding: 4px 3px; /* PADDING CELL KECIL */
+      padding: 4px 3px;
       border: 1px solid #aaa;
       text-align: center;
       vertical-align: middle;
-      height: 20px; /* TINGGI CELL KECIL */
+      height: 20px;
     }
     
     .date-cell {
-      width: 65px; /* LEBAR KOLOM TANGGAL KECIL */
+      width: 65px;
       text-align: left;
       padding-left: 6px;
       font-weight: 600;
@@ -1161,7 +1186,6 @@ function exportToPDF() {
       font-size: 9px;
     }
     
-    /* WARNA CELL */
     .cell-pagi {
       background-color: #fff3cd !important;
       color: #856404;
@@ -1196,7 +1220,7 @@ function exportToPDF() {
     
     .holiday-note {
       display: block;
-      font-size: 7px; /* FONT NOTE LEBIH KECIL */
+      font-size: 7px;
       color: #dc3545;
       font-style: italic;
       margin-top: 1px;
@@ -1220,7 +1244,6 @@ function exportToPDF() {
       color: #666;
     }
     
-    /* OPTIMASI PRINT - HILANGKAN SPASI */
     @media print {
       body {
         padding: 0;
@@ -1333,6 +1356,18 @@ shiftModal.addEventListener("click", function (e) {
 
 // Add theme transition effect
 document.body.style.transition = "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)";
+
+// Debug: Tampilkan perhitungan untuk 8 Januari 2026
+console.log("===== DEBUG INFO =====");
+console.log("START_DATE:", START_DATE.toLocaleDateString());
+console.log("BASE_SHIFT saat ini:", BASE_SHIFT);
+
+const testDate = new Date(2026, 0, 8); // 8 Januari 2026
+console.log("Tanggal 8 Januari 2026:");
+["A", "B", "C", "D"].forEach(grup => {
+  const shift = getShiftForDate(grup, testDate);
+  console.log(`Grup ${grup}: ${shift}`);
+});
 </script>
 </body>
-</html>
+  </html>
