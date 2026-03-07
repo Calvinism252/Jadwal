@@ -3,1216 +3,1758 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jadwal Kerja Shift Premium dengan Perhitungan Biasa</title>
+<title>Jadwal Shift</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900&family=Playfair+Display:wght@700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-/* ===== VARIABLES & BASE STYLES ===== */
+
+/* ╔══════════════════════════════════════════╗
+   ║  DESIGN SYSTEM — Soft Neumorphic         ║
+   ╚══════════════════════════════════════════╝ */
 :root {
-  /* Default Theme */
-  --bg: #f2f4f7;
-  --card: #fff;
-  --text: #1f2937;
-  --muted: #6b7280;
-  --pagi: #fde68a;
-  --sore: #bae6fd;
-  --malam: #d1d5db;
-  --libur: #f9a8d4;
-  --today: #2563eb22;
-  --select: #000;
-  --accent: #3b82f6;
-  --accent-gradient: linear-gradient(to right, #3b82f6, #8b5cf6);
-  --shadow: 0 10px 25px rgba(0,0,0,.08);
-  --border: #cbd5e1;
-  --header-bg: transparent;
-  --badge-text: #000;
-  --theme-bg: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="white"/></svg>');
+  --bg:        #E8ECF1;
+  --surface:   #E8ECF1;
+  --card:      #EEF1F6;
+
+  /* neumorphic shadows */
+  --sh-out:    6px 6px 14px #C8CDD6, -6px -6px 14px #FFFFFF;
+  --sh-in:     inset 3px 3px 8px #C8CDD6, inset -3px -3px 8px #FFFFFF;
+  --sh-sm:     3px 3px 8px #C8CDD6, -3px -3px 8px #FFFFFF;
+  --sh-press:  inset 2px 2px 5px #C8CDD6, inset -2px -2px 5px #FFFFFF;
+
+  --ink:       #3A4355;
+  --ink2:      #6B7A90;
+  --ink3:      #9BA8BB;
+  --accent:    #6C63FF;
+  --accent-lt: rgba(108,99,255,.12);
+
+  /* shift colors — pastel soft */
+  --pagi-bg:   #FFF8E7; --pagi-fg:  #B07B2A; --pagi-bd: #FFD980;
+  --sore-bg:   #E7F3FF; --sore-fg:  #2A6BB0; --sore-bd: #80C4FF;
+  --malam-bg:  #EEE7FF; --malam-fg: #5A2AB0; --malam-bd: #C4A0FF;
+  --libur-bg:  #FFE7EE; --libur-fg: #B02A50; --libur-bd: #FFA0BB;
+
+  --today-bar: #6C63FF;
+  --today-bg:  rgba(108,99,255,.07);
+  --holi-red:  #E05A7A;
+
+  --r:   18px;
+  --rs:  12px;
+  --rx:  8px;
 }
 
-/* ===== THEME DEFINITIONS ===== */
-body.theme-lebaran {
-  --bg: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
-  --card: #ffffff;
-  --text: #1a202c;
-  --muted: #718096;
-  --pagi: linear-gradient(135deg, #f6e05e, #d69e2e);
-  --sore: linear-gradient(135deg, #68d391, #38a169);
-  --malam: linear-gradient(135deg, #90cdf4, #4299e1);
-  --libur: linear-gradient(135deg, #fbb6ce, #ed64a6);
-  --today: rgba(104, 211, 145, 0.2);
-  --accent: #38a169;
-  --accent-gradient: linear-gradient(to right, #38a169, #2f855a);
-  --shadow: 0 10px 30px rgba(56, 161, 105, 0.15);
-  --border: #c6f6d5;
-  --header-bg: linear-gradient(135deg, #38a169, #2f855a);
-  --badge-text: #fff;
-  --theme-bg: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%2338a169" opacity="0.1"/><path d="M20,20 Q50,5 80,20 T140,20" stroke="%2338a169" stroke-width="2" fill="none" opacity="0.3"/></svg>');
-}
+/* ── THEMES ── */
 
-body.theme-natal {
-  --bg: linear-gradient(135deg, #fed7d7 0%, #fff5f5 100%);
-  --card: #ffffff;
-  --text: #2d3748;
-  --muted: #718096;
-  --pagi: linear-gradient(135deg, #fc8181, #e53e3e);
-  --sore: linear-gradient(135deg, #9ae6b4, #48bb78);
-  --malam: linear-gradient(135deg, #d69e2e, #b7791f);
-  --libur: linear-gradient(135deg, #fbb6ce, #ed64a6);
-  --today: rgba(229, 62, 62, 0.15);
-  --accent: #e53e3e;
-  --accent-gradient: linear-gradient(to right, #e53e3e, #c53030);
-  --shadow: 0 10px 30px rgba(229, 62, 62, 0.15);
-  --border: #fed7d7;
-  --header-bg: linear-gradient(135deg, #e53e3e, #c53030);
-  --badge-text: #fff;
-  --theme-bg: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23e53e3e" opacity="0.1"/><polygon points="50,10 63,38 93,38 68,55 75,85 50,68 25,85 32,55 7,38 37,38" fill="%23e53e3e" opacity="0.3"/></svg>');
+/* ── SNOW ── */
+body.th-snow {
+  --bg:#DDE8F5; --surface:#DDE8F5; --card:#E4EDF8;
+  --sh-out:6px 6px 14px #BCC9DC,-6px -6px 14px #FEFEFF;
+  --sh-in:inset 3px 3px 8px #BCC9DC,inset -3px -3px 8px #FEFEFF;
+  --sh-sm:3px 3px 8px #BCC9DC,-3px -3px 8px #FEFEFF;
+  --sh-press:inset 2px 2px 5px #BCC9DC,inset -2px -2px 5px #FEFEFF;
+  --ink:#1E3A5A; --ink2:#4A6A8A; --ink3:#85A5C5; --accent:#2980D0; --accent-lt:rgba(41,128,208,.12);
+  --pagi-bg:#E0FAFF; --pagi-fg:#0A6070; --pagi-bd:#70D8F0;
+  --sore-bg:#E0EEFF; --sore-fg:#0A3070; --sore-bd:#70A0F0;
+  --malam-bg:#EEE0FF; --malam-fg:#400A70; --malam-bd:#B070F0;
+  --libur-bg:#FFE0EE; --libur-fg:#700A30; --libur-bd:#F070A0;
+  --today-bar:#2980D0; --today-bg:rgba(41,128,208,.07); --holi-red:#D04060;
 }
+body.th-snow .header { background-image:linear-gradient(135deg,rgba(41,128,208,.1) 0%,var(--card) 60%); }
 
-body.theme-halloween {
-  --bg: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-  --card: #2d3748;
-  --text: #e2e8f0;
-  --muted: #a0aec0;
-  --pagi: linear-gradient(135deg, #ed8936, #dd6b20);
-  --sore: linear-gradient(135deg, #805ad5, #6b46c1);
-  --malam: linear-gradient(135deg, #000000, #4a5568);
-  --libur: linear-gradient(135deg, #f56565, #e53e3e);
-  --today: rgba(237, 137, 54, 0.25);
-  --accent: #ed8936;
-  --accent-gradient: linear-gradient(to right, #ed8936, #dd6b20);
-  --shadow: 0 10px 30px rgba(237, 137, 54, 0.2);
-  --border: #4a5568;
-  --header-bg: linear-gradient(135deg, #ed8936, #dd6b20);
-  --badge-text: #fff;
-  --theme-bg: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23ed8936" opacity="0.1"/><path d="M30,70 Q50,30 70,70 Q60,90 40,90 Q30,80 30,70" fill="%23ed8936" opacity="0.3"/></svg>');
+/* ── HALLOWEEN ── */
+body.th-halloween {
+  --bg:#1A0F05; --surface:#1A0F05; --card:#201408;
+  --sh-out:4px 4px 10px #0D0803,-4px -4px 10px #2C1C0A;
+  --sh-in:inset 3px 3px 7px #0D0803,inset -3px -3px 7px #2C1C0A;
+  --sh-sm:3px 3px 7px #0D0803,-3px -3px 7px #2C1C0A;
+  --sh-press:inset 2px 2px 5px #0D0803,inset -2px -2px 5px #2C1C0A;
+  --ink:#F0D8A0; --ink2:#C89050; --ink3:#806030; --accent:#F07020; --accent-lt:rgba(240,112,32,.12);
+  --pagi-bg:#2A1400; --pagi-fg:#F0A050; --pagi-bd:#A05018;
+  --sore-bg:#180A30; --sore-fg:#C090F0; --sore-bd:#6030A0;
+  --malam-bg:#100808; --malam-fg:#D08050; --malam-bd:#703010;
+  --libur-bg:#2A0808; --libur-fg:#F08080; --libur-bd:#A02020;
+  --today-bar:#F07020; --today-bg:rgba(240,112,32,.1); --holi-red:#F06060;
 }
+body.th-halloween .header { background-image:linear-gradient(135deg,rgba(240,112,32,.14) 0%,var(--card) 60%); }
 
-body.theme-luar-angkasa {
-  --bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  --card: #1e293b;
-  --text: #e2e8f0;
-  --muted: #94a3b8;
-  --pagi: linear-gradient(135deg, #60a5fa, #3b82f6);
-  --sore: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  --malam: linear-gradient(135deg, #1e40af, #1e3a8a);
-  --libur: linear-gradient(135deg, #ec4899, #db2777);
-  --today: rgba(96, 165, 250, 0.25);
-  --accent: #60a5fa;
-  --accent-gradient: linear-gradient(to right, #60a5fa, #8b5cf6);
-  --shadow: 0 10px 30px rgba(96, 165, 250, 0.2);
-  --border: #334155;
-  --header-bg: linear-gradient(135deg, #1e40af, #1e3a8a);
-  --badge-text: #fff;
-  --theme-bg: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%231e40af" opacity="0.1"/><circle cx="20" cy="20" r="2" fill="white" opacity="0.8"/><circle cx="60" cy="40" r="1.5" fill="white" opacity="0.8"/><circle cx="80" cy="70" r="1" fill="white" opacity="0.8"/><circle cx="40" cy="80" r="1.5" fill="white" opacity="0.8"/></svg>');
+/* ── FOREST ── */
+body.th-forest {
+  --bg:#D8EAD8; --surface:#D8EAD8; --card:#DEEEDE;
+  --sh-out:6px 6px 14px #B8C8B8,-6px -6px 14px #F8FFF8;
+  --sh-in:inset 3px 3px 8px #B8C8B8,inset -3px -3px 8px #F8FFF8;
+  --sh-sm:3px 3px 8px #B8C8B8,-3px -3px 8px #F8FFF8;
+  --sh-press:inset 2px 2px 5px #B8C8B8,inset -2px -2px 5px #F8FFF8;
+  --ink:#1A3A1A; --ink2:#3A6A3A; --ink3:#70A070; --accent:#2E7D32; --accent-lt:rgba(46,125,50,.12);
+  --pagi-bg:#E0FFF0; --pagi-fg:#0A5030; --pagi-bd:#70D0A0;
+  --sore-bg:#E8FFE0; --sore-fg:#205010; --sore-bd:#80C870;
+  --malam-bg:#F0FFE0; --malam-fg:#305810; --malam-bd:#A0D860;
+  --libur-bg:#FFE8E0; --libur-fg:#502010; --libur-bd:#F0A080;
+  --today-bar:#2E7D32; --today-bg:rgba(46,125,50,.07); --holi-red:#C84040;
 }
+body.th-forest .header { background-image:linear-gradient(135deg,rgba(46,125,50,.1) 0%,var(--card) 60%); }
 
-body.theme-musim-salju {
-  --bg: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
-  --card: #ffffff;
-  --text: #1e3a8a;
-  --muted: #475569;
-  --pagi: linear-gradient(135deg, #93c5fd, #60a5fa);
-  --sore: linear-gradient(135deg, #c7d2fe, #a5b4fc);
-  --malam: linear-gradient(135deg, #dbeafe, #bfdbfe);
-  --libur: linear-gradient(135deg, #fecdd3, #fda4af);
-  --today: rgba(96, 165, 250, 0.2);
-  --accent: #3b82f6;
-  --accent-gradient: linear-gradient(to right, #3b82f6, #1d4ed8);
-  --shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
-  --border: #bfdbfe;
-  --header-bg: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  --badge-text: #fff;
-  --theme-bg: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%233b82f6" opacity="0.1"/><path d="M20,40 Q30,20 50,40 Q70,20 80,40 Q70,60 50,40 Q30,60 20,40" fill="%233b82f6" opacity="0.3"/></svg>');
+/* ── ISLAMIC — krem pastel hangat ── */
+body.th-islamic {
+  --bg:#F0E6D0; --surface:#F0E6D0; --card:#F5ECD8;
+  --sh-out:6px 6px 14px #D0C0A0,-6px -6px 14px #FFFFF8;
+  --sh-in:inset 3px 3px 8px #D0C0A0,inset -3px -3px 8px #FFFFF8;
+  --sh-sm:3px 3px 8px #D0C0A0,-3px -3px 8px #FFFFF8;
+  --sh-press:inset 2px 2px 5px #D0C0A0,inset -2px -2px 5px #FFFFF8;
+  --ink:#2A1800; --ink2:#7A4818; --ink3:#C08848; --accent:#C8580A; --accent-lt:rgba(200,88,10,.12);
+  --pagi-bg:#FFF3DC; --pagi-fg:#7A3800; --pagi-bd:#F0A840;
+  --sore-bg:#FFE8D8; --sore-fg:#6A2808; --sore-bd:#F08060;
+  --malam-bg:#F8E8FF; --malam-fg:#480868; --malam-bd:#C880E8;
+  --libur-bg:#E8F5E8; --libur-fg:#1A4820; --libur-bd:#80C880;
+  --today-bar:#C8580A; --today-bg:rgba(200,88,10,.07); --holi-red:#C83010;
 }
+body.th-islamic .header { background-image:linear-gradient(135deg,rgba(200,88,10,.12) 0%,var(--card) 60%); }
 
-body.theme-dark {
-  --bg: #0f172a;
-  --card: #1e293b;
-  --text: #e5e7eb;
-  --muted: #9ca3af;
-  --pagi: #92400e;
-  --sore: #075985;
-  --malam: #374151;
-  --libur: #065f46;
-  --today: #38bdf822;
-  --select: #fff;
-  --accent: #60a5fa;
-  --accent-gradient: linear-gradient(to right, #60a5fa, #a78bfa);
-  --shadow: 0 10px 25px rgba(0,0,0,0.3);
-  --border: #374151;
-  --header-bg: transparent;
-  --badge-text: #fff;
-  --theme-bg: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%230f172a"/><circle cx="50" cy="50" r="20" fill="%2360a5fa" opacity="0.1"/></svg>');
+/* ── SPACE — ungu lavender gelap ── */
+body.th-space {
+  --bg:#1A1428; --surface:#1A1428; --card:#201830;
+  --sh-out:4px 4px 10px #100C1A,-4px -4px 10px #2A2040;
+  --sh-in:inset 3px 3px 7px #100C1A,inset -3px -3px 7px #2A2040;
+  --sh-sm:3px 3px 7px #100C1A,-3px -3px 7px #2A2040;
+  --sh-press:inset 2px 2px 5px #100C1A,inset -2px -2px 5px #2A2040;
+  --ink:#E0D8F8; --ink2:#A090D0; --ink3:#604880; --accent:#9B6DFA; --accent-lt:rgba(155,109,250,.12);
+  --pagi-bg:#2A1A40; --pagi-fg:#E0B8FF; --pagi-bd:#9050D0;
+  --sore-bg:#1A1038; --sore-fg:#C0A8FF; --sore-bd:#6840B8;
+  --malam-bg:#280E3A; --malam-fg:#F0B8E8; --malam-bd:#B04898;
+  --libur-bg:#1A2830; --libur-fg:#90D0E8; --libur-bd:#3888A8;
+  --today-bar:#9B6DFA; --today-bg:rgba(155,109,250,.12); --holi-red:#E060A0;
 }
+body.th-space .header { background-image:linear-gradient(135deg,rgba(155,109,250,.18) 0%,var(--card) 60%); }
 
-/* ===== BASE STYLES ===== */
+/* ── CHRISTMAS ── */
+body.th-xmas {
+  --bg:#F0D8D8; --surface:#F0D8D8; --card:#F5DEDE;
+  --sh-out:6px 6px 14px #D0B8B8,-6px -6px 14px #FFFEFE;
+  --sh-in:inset 3px 3px 8px #D0B8B8,inset -3px -3px 8px #FFFEFE;
+  --sh-sm:3px 3px 8px #D0B8B8,-3px -3px 8px #FFFEFE;
+  --sh-press:inset 2px 2px 5px #D0B8B8,inset -2px -2px 5px #FFFEFE;
+  --ink:#3A0A0A; --ink2:#8A2A2A; --ink3:#C07070; --accent:#C62828; --accent-lt:rgba(198,40,40,.12);
+  --pagi-bg:#FFEEEE; --pagi-fg:#900A0A; --pagi-bd:#F09090;
+  --sore-bg:#E8FFE8; --sore-fg:#0A500A; --sore-bd:#80D080;
+  --malam-bg:#FFFFE0; --malam-fg:#505000; --malam-bd:#D0D040;
+  --libur-bg:#EEE0FF; --libur-fg:#300A60; --libur-bd:#A070D0;
+  --today-bar:#C62828; --today-bg:rgba(198,40,40,.07); --holi-red:#C62828;
+}
+body.th-xmas .header { background-image:linear-gradient(135deg,rgba(198,40,40,.1) 0%,rgba(46,125,50,.08) 100%); }
+
+/* ── DARK ── */
+body.th-dark {
+  --bg:#141420; --surface:#141420; --card:#181824;
+  --sh-out:4px 4px 10px #0C0C16,-4px -4px 10px #202030;
+  --sh-in:inset 3px 3px 7px #0C0C16,inset -3px -3px 7px #202030;
+  --sh-sm:3px 3px 7px #0C0C16,-3px -3px 7px #202030;
+  --sh-press:inset 2px 2px 5px #0C0C16,inset -2px -2px 5px #202030;
+  --ink:#D8D8F0; --ink2:#8080A8; --ink3:#404060; --accent:#7C6DFA; --accent-lt:rgba(124,109,250,.12);
+  --pagi-bg:#201800; --pagi-fg:#D0A830; --pagi-bd:#806810;
+  --sore-bg:#080C20; --sore-fg:#80A8E0; --sore-bd:#203870;
+  --malam-bg:#100818; --malam-fg:#B080D8; --malam-bd:#503080;
+  --libur-bg:#180808; --libur-fg:#D08080; --libur-bd:#701818;
+  --today-bar:#7C6DFA; --today-bg:rgba(124,109,250,.1); --holi-red:#D06080;
+}
+body.th-dark .header { background-image:linear-gradient(135deg,rgba(124,109,250,.12) 0%,var(--card) 60%); }
+
+/* ╔══════════════════════════════════════════╗
+   ║  BASE                                    ║
+   ╚══════════════════════════════════════════╝ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 body {
-  margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: 'Nunito', system-ui, sans-serif;
   background: var(--bg);
-  background-image: var(--theme-bg);
-  color: var(--text);
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--ink);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background .45s, color .45s;
 }
-
-/* Fullscreen mode */
-body:fullscreen {
-  background: var(--bg);
-  padding: 20px;
+.page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 20px 16px 80px;
 }
-
-body:fullscreen .container {
-  max-width: 95%;
-  margin: auto;
-}
-
-.container {
-  max-width: 920px;
-  margin: auto;
-  padding: 20px;
-}
-
-/* ===== HEADER STYLES ===== */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.app-shell {
+  border-radius: var(--r);
+  box-shadow: var(--sh-out);
+  overflow: hidden;
   margin-bottom: 20px;
-  padding: 15px 20px;
-  background: var(--header-bg);
-  border-radius: 16px;
-  box-shadow: var(--shadow);
-  position: relative;
+}
+
+/* ╔══════════════════════════════════════════╗
+   ║  HEADER — compact neumorphic              ║
+   ╚══════════════════════════════════════════╝ */
+.header {
+  border-radius: var(--r) var(--r) 0 0;
+  box-shadow: var(--sh-out);
+  margin-bottom: 0;
   overflow: hidden;
-}
-
-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--accent-gradient);
-}
-
-.header-left h1 {
-  font-size: 24px;
-  margin: 0;
-  background: linear-gradient(135deg, var(--accent), var(--text));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: 800;
-  color: #fff !important;
-}
-
-.sub {
-  color: var(--muted);
-  font-size: 14px;
-  margin-top: 4px;
-}
-
-.header-right {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-/* ===== CARD STYLES ===== */
-.card {
+  position: relative;
   background: var(--card);
-  border-radius: 20px;
-  box-shadow: var(--shadow);
-  padding: 25px;
-  border: 1px solid var(--border);
-  position: relative;
-  overflow: hidden;
+  min-height: 150px;
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--accent-gradient);
-}
+/* illustration canvas layers */
+.hdr-sky   { position:absolute; inset:0; z-index:0; }
+.hdr-mid   { position:absolute; inset:0; z-index:1; pointer-events:none; }
+.hdr-fore  { position:absolute; inset:0; z-index:2; pointer-events:none; }
+.hdr-glow  { position:absolute; inset:0; z-index:3; pointer-events:none;
+             background:linear-gradient(to top, rgba(0,0,0,.62) 0%, rgba(0,0,0,.15) 50%, transparent 100%); }
 
-/* ===== CONTROLS ===== */
-.controls {
+.hdr-body {
+  padding: 22px 20px 20px;
   display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-  margin-bottom: 25px;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  position: relative;
+  z-index: 4;
+  min-height: 150px;
+}
+.hdr-body {
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
   justify-content: center;
+  position: relative;
+  z-index: 4;
+  min-height: 150px;
+}
+.hdr-center {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 5px;
-  background: rgba(0,0,0,0.02);
-  border-radius: 12px;
-  border: 1px solid var(--border);
-}
-
-body.theme-dark .controls {
-  background: rgba(255,255,255,0.02);
-}
-
-input, button, select {
-  padding: 10px 16px;
-  border-radius: 12px;
-  border: 2px solid var(--border);
-  background: var(--card);
-  color: var(--text);
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  font-size: 14px;
-}
-
-input:hover, button:hover, select:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-button.primary {
-  background: var(--accent-gradient);
-  color: white;
-  border: none;
-  font-weight: 700;
-}
-
-button.primary:hover {
-  background: var(--accent);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(var(--accent-rgb, 59,130,246), 0.3);
-}
-
-/* ===== THEME SELECTOR ===== */
-.theme-selector {
-  position: relative;
-  min-width: 160px;
-}
-
-.theme-selector select {
-  width: 100%;
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 16px;
-  padding-right: 40px;
-}
-
-/* ===== TABLE STYLES ===== */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-  table-layout: fixed;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-th, td {
-  padding: 12px 8px;
   text-align: center;
-  border-bottom: 1px solid var(--border);
+  gap: 0;
+  animation: fadeUp .5s .05s cubic-bezier(.34,1.1,.64,1) both;
 }
-
-th {
-  color: var(--muted);
-  font-weight: 700;
+.hdr-eyebrow {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .68rem; font-weight: 600;
+  letter-spacing: 5px;
+  color: rgba(255,255,255,.72);
+  margin-bottom: 3px;
   text-transform: uppercase;
-  font-size: 12px;
-  letter-spacing: 0.5px;
-  background: rgba(0,0,0,0.02);
+  text-shadow: 0 1px 8px rgba(0,0,0,.5);
 }
-
-body.theme-dark th {
-  background: rgba(255,255,255,0.02);
+.hdr-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .68rem; font-weight: 600;
+  color: rgba(255,255,255,.72);
+  line-height: 1.3;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 10px rgba(0,0,0,.5);
 }
-
-tr.today {
-  background: var(--today);
-  position: relative;
-}
-
-/* ===== SELECTED ROW STYLES ===== */
-tr.selected {
-  position: relative;
-  background: linear-gradient(90deg, transparent 0%, rgba(var(--accent-rgb, 59,130,246), 0.15) 50%, transparent 100%);
-  box-shadow: 
-    inset 0 2px 12px rgba(var(--accent-rgb, 59,130,246), 0.1),
-    inset 0 -2px 12px rgba(var(--accent-rgb, 59,130,246), 0.1);
-}
-
-tr.selected td {
-  position: relative;
-}
-
-tr.selected td:first-child::before {
-  content: '';
-  position: absolute;
-  left: -2px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 70%;
-  background: var(--accent-gradient);
+.hdr-title em { font-style: normal; }
+.hdr-divider {
+  width: 38px; height: 1.5px;
+  background: rgba(255,255,255,.4);
   border-radius: 2px;
-  box-shadow: 0 0 12px var(--accent);
+  margin: 8px auto 7px;
+}
+.hdr-month {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .85rem; font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 16px rgba(0,0,0,.6), 0 1px 4px rgba(0,0,0,.4);
 }
 
-tr.selected .badge {
-  transform: scale(1.08);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+
+/* ╔══════════════════════════════════════════╗
+   ║  CONTROLS                                ║
+   ╚══════════════════════════════════════════╝ */
+.ctrl {
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--card);
+  padding: 16px 16px 14px;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-tr:not(.selected):hover {
-  background: rgba(0, 0, 0, 0.04);
-  transition: background 0.2s ease;
+/* Row 1: month navigation */
+.ctrl-nav {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.nav-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  box-shadow: var(--sh-sm);
+  background: var(--card);
+  border: none;
+  color: var(--ink2);
+  font-size: 1.05rem; font-weight: 900;
   cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: box-shadow .18s, transform .18s;
+  flex-shrink: 0;
 }
+.nav-btn:hover  { box-shadow: var(--sh-out); transform: scale(1.06); }
+.nav-btn:active { box-shadow: var(--sh-press); transform: scale(.96); }
 
-body.theme-dark tr:not(.selected):hover {
-  background: rgba(255, 255, 255, 0.06);
+.month-pick-wrap {
+  position: relative;
+  display: flex; align-items: center;
 }
-
-/* ===== BADGE STYLES ===== */
-.badge {
-  display: inline-block;
-  width: 75px;
+.month-label {
+  padding: 9px 20px;
+  border-radius: 100px;
+  box-shadow: var(--sh-in);
+  background: var(--card);
+  font-size: .88rem; font-weight: 800;
+  color: var(--ink);
+  white-space: nowrap;
+  min-width: 148px;
   text-align: center;
-  padding: 8px 0;
-  border-radius: 20px;
-  font-weight: 800;
-  font-size: 12px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: var(--badge-text);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  letter-spacing: 0.3px;
+}
+.month-pick-wrap input[type=month] {
+  position: absolute; inset: 0;
+  opacity: 0; cursor: pointer;
+  width: 100%; border: none; background: none;
 }
 
-.pagi {
-  background: var(--pagi);
-  box-shadow: 0 4px 12px rgba(253, 230, 138, 0.4);
+/* Row 2: action buttons */
+.ctrl-act { display: flex; gap: 10px; }
+.ctrl-btn {
+  flex: 1;
+  padding: 11px 12px;
+  border-radius: var(--rs);
+  box-shadow: var(--sh-sm);
+  background: var(--card);
+  border: none;
+  color: var(--ink2);
+  font-family: 'Nunito', sans-serif;
+  font-size: .82rem; font-weight: 800;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  transition: box-shadow .18s, transform .18s, color .18s;
+}
+.ctrl-btn:hover  { box-shadow: var(--sh-out); color: var(--accent); transform: translateY(-1px); }
+.ctrl-btn:active { box-shadow: var(--sh-press); transform: translateY(0); }
+.ctrl-btn-l { display: flex; align-items: center; gap: 6px; }
+.ctrl-btn-arr { font-size: .72rem; opacity: .45; }
+
+/* ╔══════════════════════════════════════════╗
+   ║  TABLE CARD                              ║
+   ╚══════════════════════════════════════════╝ */
+.table-card {
+  border-radius: 0 0 var(--r) var(--r);
+  box-shadow: var(--sh-out);
+  background: var(--card);
+  overflow: hidden;
+  margin-bottom: 20px;
 }
 
-.sore {
-  background: var(--sore);
-  box-shadow: 0 4px 12px rgba(186, 230, 253, 0.4);
-}
+.tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 
-.malam {
-  background: var(--malam);
-  box-shadow: 0 4px 12px rgba(209, 213, 219, 0.4);
+thead th {
+  padding: 11px 6px;
+  font-size: .64rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .9px;
+  color: var(--ink3);
+  background: var(--card);
+  border-bottom: 1.5px solid rgba(0,0,0,.05);
+  text-align: center; white-space: nowrap;
 }
+body.th-halloween thead th,
+body.th-space thead th,
+body.th-dark thead th { border-bottom-color: rgba(255,255,255,.05); }
 
-.libur {
-  background: var(--libur);
-  box-shadow: 0 4px 12px rgba(249, 168, 212, 0.4);
+thead th:first-child { text-align: left; padding-left: 16px; width: 96px; }
+thead th:not(:first-child) { border-left: 1px solid rgba(0,0,0,.04); }
+body.th-halloween thead th:not(:first-child),
+body.th-space thead th:not(:first-child),
+body.th-dark thead th:not(:first-child) { border-left-color: rgba(255,255,255,.04); }
+
+/* rows */
+tbody tr {
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0,0,0,.04);
+  transition: background .1s;
 }
+body.th-halloween tbody tr,
+body.th-space tbody tr,
+body.th-dark tbody tr { border-bottom-color: rgba(255,255,255,.04); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(108,99,255,.04); }
 
-/* ===== DATE CELL STYLES ===== */
-table td:first-child {
-  border-right: 3px solid var(--accent);
-  padding-right: 15px;
-  font-weight: 700;
-  text-align: left;
+tbody tr.is-today {
+  background: var(--today-bg) !important;
+}
+tbody tr.is-today td.dc {
+  border-left: 3px solid var(--today-bar);
+  padding-left: 13px !important;
+}
+tbody tr.is-sel {
+  background: var(--accent-lt) !important;
+}
+tbody tr.is-holi td { background: rgba(224,90,122,.04); }
+body.th-halloween tbody tr.is-holi td,
+body.th-space tbody tr.is-holi td,
+body.th-dark tbody tr.is-holi td { background: rgba(224,90,122,.08) !important; }
+
+/* date cell */
+td.dc {
+  padding: 10px 6px 10px 16px;
+  text-align: left; vertical-align: top;
   min-width: 90px;
 }
+.dc-row { display: flex; align-items: baseline; gap: 5px; }
+.dc-num {
+  font-size: .95rem; font-weight: 900;
+  color: var(--ink); line-height: 1; min-width: 22px;
+}
+.dc-day {
+  font-size: .6rem; font-weight: 700;
+  color: var(--ink3); text-transform: uppercase; letter-spacing: .5px;
+}
+.dc-sun .dc-num, .dc-sun .dc-day { color: var(--holi-red) !important; }
 
-.sunday {
-  color: #ef4444 !important;
-  font-weight: 800;
+.lbl-today {
+  display: inline-flex; align-items: center;
+  margin-top: 3px; padding: 2px 7px;
+  border-radius: 100px;
+  font-size: .54rem; font-weight: 800; letter-spacing: .5px; text-transform: uppercase;
+  background: var(--today-bar); color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.18);
+}
+.holi-nm {
+  display: block; margin-top: 3px;
+  font-size: .58rem; font-weight: 700;
+  color: var(--holi-red); line-height: 1.35;
+  max-width: 80px; white-space: normal;
 }
 
-.holiday-note {
-  display: block;
-  font-size: 11px;
-  color: #ef4444;
-  margin-top: 4px;
-  font-style: italic;
-  font-weight: 600;
+/* shift cells */
+td.sc {
+  text-align: center; padding: 8px 4px;
+  border-left: 1px solid rgba(0,0,0,.04);
+  vertical-align: middle;
 }
+body.th-halloween td.sc,
+body.th-space td.sc,
+body.th-dark td.sc { border-left-color: rgba(255,255,255,.04); }
 
-/* ===== MODAL STYLES ===== */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
+/* ╔══════════════════════════════════════════╗
+   ║  BADGES — soft neumorphic pills          ║
+   ╚══════════════════════════════════════════╝ */
+.badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 66px; padding: 5px 0;
+  border-radius: 100px;
+  font-weight: 800; font-size: .68rem;
+  border: 1.5px solid transparent;
+  transition: transform .15s, box-shadow .15s;
+  /* neumorphic badge */
+  box-shadow: 2px 2px 5px rgba(0,0,0,.08), -1px -1px 4px rgba(255,255,255,.6);
+}
+body.th-halloween .badge,
+body.th-space .badge,
+body.th-dark .badge {
+  box-shadow: 2px 2px 5px rgba(0,0,0,.3), -1px -1px 4px rgba(255,255,255,.03);
+}
+tbody tr:hover .badge { transform: scale(1.06); }
+
+.pagi  { background:var(--pagi-bg);  color:var(--pagi-fg);  border-color:var(--pagi-bd);  }
+.sore  { background:var(--sore-bg);  color:var(--sore-fg);  border-color:var(--sore-bd);  }
+.malam { background:var(--malam-bg); color:var(--malam-fg); border-color:var(--malam-bd); }
+.libur { background:var(--libur-bg); color:var(--libur-fg); border-color:var(--libur-bd); }
+
+/* ╔══════════════════════════════════════════╗
+   ║  PDF BUTTON                              ║
+   ╚══════════════════════════════════════════╝ */
+.pdf-btn {
   width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  justify-content: center;
-  align-items: center;
-  backdrop-filter: blur(5px);
+  padding: 15px;
+  border-radius: var(--r);
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: .95rem; font-weight: 900;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  letter-spacing: .3px;
+  box-shadow: 4px 4px 12px rgba(0,0,0,.18), -2px -2px 8px rgba(255,255,255,.15),
+              0 4px 20px color-mix(in srgb, var(--accent) 40%, transparent);
+  transition: box-shadow .2s, transform .15s, filter .15s;
+  margin-bottom: 20px;
 }
+.pdf-btn:hover  { filter: brightness(1.08); transform: translateY(-2px); box-shadow: 6px 6px 18px rgba(0,0,0,.22), -2px -2px 10px rgba(255,255,255,.15), 0 8px 28px color-mix(in srgb, var(--accent) 45%, transparent); }
+.pdf-btn:active { transform: translateY(0); filter: brightness(.98); }
 
-.modal-content {
+/* ╔══════════════════════════════════════════╗
+   ║  FOOTER                                  ║
+   ╚══════════════════════════════════════════╝ */
+.footer {
+  text-align: center;
+  font-size: .68rem; color: var(--ink3); font-weight: 600;
+  padding-bottom: 8px;
+}
+.footer b { color: var(--ink2); }
+
+/* ╔══════════════════════════════════════════╗
+   ║  BOTTOM SHEETS                           ║
+   ╚══════════════════════════════════════════╝ */
+.sheet-ov {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 200;
+  justify-content: center; align-items: flex-end;
+}
+.sheet {
   background: var(--card);
-  padding: 30px;
-  border-radius: 20px;
-  min-width: 300px;
-  max-width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
-  border: 1px solid var(--border);
-  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-  position: relative;
+  border-radius: 28px 28px 0 0;
+  width: 100%; max-width: 480px;
+  padding-bottom: 32px;
+  box-shadow: 0 -8px 40px rgba(0,0,0,.2);
+  animation: sheetUp .32s cubic-bezier(.34,1.3,.64,1) both;
 }
+@keyframes sheetUp { from{transform:translateY(100%); opacity:.6} to{transform:translateY(0); opacity:1} }
 
-.modal-content::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--accent-gradient);
-  border-radius: 20px 20px 0 0;
-}
+.sheet-handle { width: 38px; height: 4px; border-radius: 2px; background: var(--ink3); opacity: .3; margin: 14px auto 0; }
+.sheet-title { font-size: 1rem; font-weight: 900; color: var(--ink); padding: 16px 22px 0; }
+.sheet-sub { font-size: .72rem; color: var(--ink2); padding: 3px 22px 14px; font-weight: 600; }
+.sheet-divider { height: 1px; background: rgba(0,0,0,.06); margin: 0 18px 16px; }
+body.th-halloween .sheet-divider,
+body.th-space .sheet-divider,
+body.th-dark .sheet-divider { background: rgba(255,255,255,.06); }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-  .container {
-    padding: 12px;
-  }
-  
-  header {
-    flex-direction: column;
-    gap: 15px;
-    text-align: center;
-    padding: 20px;
-  }
-  
-  .header-right {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .controls {
-    gap: 8px;
-  }
-  
-  .card {
-    padding: 16px;
-  }
-  
-  table {
-    font-size: 12px;
-  }
-  
-  th, td {
-    padding: 8px 4px;
-  }
-  
-  .badge {
-    width: 60px;
-    padding: 6px 0;
-    font-size: 11px;
-  }
-  
-  table td:first-child {
-    min-width: 70px;
-    padding-right: 8px;
-  }
+/* theme grid */
+.theme-grid { display: grid; grid-template-columns:repeat(4,1fr); gap:10px; padding:0 16px; }
+.tg {
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  padding: 14px 6px;
+  border-radius: var(--rs);
+  border: none;
+  box-shadow: var(--sh-sm);
+  background: var(--card);
+  cursor: pointer;
+  transition: box-shadow .2s, transform .2s;
 }
+.tg:hover { box-shadow: var(--sh-out); transform: translateY(-2px); }
+.tg.on { box-shadow: var(--sh-in); }
+.tg-emoji { font-size: 1.7rem; line-height: 1; }
+.tg-name { font-size: .62rem; font-weight: 800; color: var(--ink2); text-align: center; letter-spacing: .3px; }
+.tg.on .tg-name { color: var(--accent); }
 
-/* ===== ANIMATIONS ===== */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+/* shift form rows */
+.sg {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 22px;
+  border-bottom: 1px solid rgba(0,0,0,.05);
 }
+body.th-halloween .sg,
+body.th-space .sg,
+body.th-dark .sg { border-bottom-color: rgba(255,255,255,.05); }
+.sg:last-of-type { border-bottom: none; }
+.sg-lbl { display: flex; align-items: center; gap: 9px; font-size: .85rem; font-weight: 800; color: var(--ink); }
+.sg-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.m-sel {
+  appearance: none;
+  background: var(--card);
+  box-shadow: var(--sh-in);
+  border: none;
+  border-radius: var(--rx);
+  color: var(--ink);
+  font-family: 'Nunito', sans-serif;
+  font-size: .78rem; font-weight: 700;
+  padding: 7px 28px 7px 11px; cursor: pointer;
+  min-width: 118px; outline: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239BA8BB' stroke-width='2.5'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat; background-position: right 7px center; background-size: 11px;
+  transition: box-shadow .15s;
+}
+.m-sel:focus { box-shadow: var(--sh-press); }
 
-@keyframes glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(var(--accent-rgb, 59,130,246), 0.3); }
-  50% { box-shadow: 0 0 30px rgba(var(--accent-rgb, 59,130,246), 0.5); }
+.sheet-footer { display: flex; gap: 10px; padding: 14px 16px 0; }
+.sh-btn {
+  flex: 1; padding: 12px;
+  border-radius: var(--rs);
+  box-shadow: var(--sh-sm);
+  background: var(--card);
+  border: none;
+  color: var(--ink2);
+  font-family: 'Nunito', sans-serif;
+  font-size: .82rem; font-weight: 800;
+  cursor: pointer;
+  transition: box-shadow .18s, transform .15s, color .18s;
 }
+.sh-btn:hover  { box-shadow: var(--sh-out); color: var(--accent); transform: translateY(-1px); }
+.sh-btn:active { box-shadow: var(--sh-press); }
+.sh-btn.primary {
+  background: var(--accent); color: #fff;
+  box-shadow: 3px 3px 10px rgba(0,0,0,.18), 0 4px 16px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.sh-btn.primary:hover { filter: brightness(1.08); color:#fff; }
 
-.card {
-  animation: fadeIn 0.6s ease-out;
-}
+/* ── ROW ANIMATION ── */
+@keyframes rIn { from{opacity:0;transform:translateX(-5px)} to{opacity:1;transform:translateX(0)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.app-shell { animation: fadeUp .4s cubic-bezier(.34,1.1,.64,1) both; }
+.pdf-btn   { animation: fadeUp .4s .12s cubic-bezier(.34,1.1,.64,1) both; }
+.ri { animation: rIn .2s ease both; }
 
-.primary {
-  animation: glow 2s ease-in-out infinite;
-}
-
-/* ===== THEME PREVIEW IN SELECT ===== */
-.theme-selector option[value="default"] {
-  background: linear-gradient(135deg, #f2f4f7, #fff);
-  color: #1f2937;
-}
-
-.theme-selector option[value="lebaran"] {
-  background: linear-gradient(135deg, #38a169, #2f855a);
-  color: white;
-}
-
-.theme-selector option[value="natal"] {
-  background: linear-gradient(135deg, #e53e3e, #c53030);
-  color: white;
-}
-
-.theme-selector option[value="halloween"] {
-  background: linear-gradient(135deg, #ed8936, #dd6b20);
-  color: white;
-}
-
-.theme-selector option[value="luar-angkasa"] {
-  background: linear-gradient(135deg, #1e40af, #1e3a8a);
-  color: white;
-}
-
-.theme-selector option[value="musim-salju"] {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  color: white;
-}
-
-.theme-selector option[value="dark"] {
-  background: linear-gradient(135deg, #1e293b, #0f172a);
-  color: white;
-}
-.calendar-icon {
-  -webkit-text-fill-color: initial;
-  background: none;
-  color: var(--muted);
-  margin-right: 6px;
-}
-header .sub {
-  color: white;
-  opacity: 0.85;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.25);
-  font-weight: 600;
+/* ── RESPONSIVE ── */
+@media(max-width:480px){
+  .page { padding: 14px 12px 72px; }
+  .hdr-body { padding: 18px 16px 16px; }
+  .ctrl { padding: 14px 14px 12px; }
+  .badge { width: 60px; font-size: .64rem; }
+  td.dc { padding: 9px 4px 9px 12px; min-width: 82px; }
+  tbody tr.is-today td.dc { padding-left: 9px !important; }
 }
 </style>
 </head>
 <body>
-<div class="container">
-<header>
-  <div class="header-left">
-    <h1>
-  <span class="calendar-icon">📅</span>
-  Jadwal Kerja Shift 4 Grup
-   </h1>
-    <div class="sub" id="monthLabel"></div>
-  </div>
-  <div class="header-right">
-    <!-- Theme Selector -->
-    <div class="theme-selector">
-      <select id="themeSelect" title="Pilih tema">
-        <option value="default">🎨 Default</option>
-        <option value="lebaran">🌿 Lebaran</option>
-        <option value="natal">🎄 Natal</option>
-        <option value="halloween">🎃 Halloween</option>
-        <option value="luar-angkasa">🚀 Luar Angkasa</option>
-        <option value="musim-salju">❄️ Musim Salju</option>
-        <option value="dark">🌙 Dark Mode</option>
-      </select>
-    </div>
-    
-    <button id="fullscreenToggle" aria-label="Toggle fullscreen" title="Fullscreen">⛶</button>    
-    <button id="darkToggle" aria-label="Toggle dark mode" title="Toggle Dark Mode">🌙</button>
-  </div>
-</header>
+<div class="page">
 
-<div class="card">
-<div class="controls">
-  <button id="prev" title="Bulan sebelumnya (←)">⬅️ Prev</button>
-  <input type="month" id="monthPicker" title="Pilih bulan">
-  <button id="next" title="Bulan berikutnya (→)">Next ➡️</button>
-  <button onclick="openShiftModal()" title="Atur shift hari ini">⚙️ Custom Shift</button>
-  <button class="primary" onclick="exportToPDF()" title="Cetak jadwal">🖨️ Cetak / PDF</button>
-</div>
-
-<table>
-<thead>
-<tr>
-  <th>Tanggal</th>
-  <th>Grup A</th>
-  <th>Grup B</th>
-  <th>Grup C</th>
-  <th>Grup D</th>
-</tr>
-</thead>
-<tbody id="tableBody">
-  <!-- Jadwal akan diisi oleh JavaScript -->
-</tbody>
-</table>
-</div>
-</div>
-
-<!-- Modal Setting Shift -->
-<div id="shiftModal" class="modal">
-<div class="modal-content">
-  <h3 style="margin:0 0 15px 0;display:flex;align-items:center;gap:10px;">⚙️ Pengaturan Shift</h3>
-  
-  <div style="background:var(--today);padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:14px;" id="shiftInfo">
-    <strong>📅 Atur shift untuk:</strong> <span id="todayDateLabel">Hari ini</span>
-  </div>
-  
-  <!-- Shift Inputs untuk sistem biasa -->
-  <div style="display:grid;gap:15px;margin-top:10px;">
-    <label style="display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-weight:700;">👥 Grup A</span>
-      <select id="shiftA" style="padding:8px 12px;border-radius:10px;background:var(--card);color:var(--text);min-width:150px;border:2px solid var(--border);">
-        <option value="0">Pagi 1</option>
-        <option value="1">Pagi 1</option>
-        <option value="2">Sore 1</option>
-        <option value="3">Sore 2</option>
-        <option value="4">Malam 1</option>
-        <option value="5">Malam 2</option>
-        <option value="6">Libur 1</option>
-        <option value="7">Libur 2</option>
-      </select>
-    </label>
-    <label style="display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-weight:700;">👥 Grup B</span>
-      <select id="shiftB" style="padding:8px 12px;border-radius:10px;background:var(--card);color:var(--text);min-width:150px;border:2px solid var(--border);">
-        <option value="0">Pagi 1</option>
-        <option value="1">Pagi 2</option>
-        <option value="2">Sore 1</option>
-        <option value="3">Sore 2</option>
-        <option value="4">Malam 1</option>
-        <option value="5">Malam 2</option>
-        <option value="6">Libur 1</option>
-        <option value="7">Libur 2</option>
-      </select>
-    </label>
-    <label style="display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-weight:700;">👥 Grup C</span>
-      <select id="shiftC" style="padding:8px 12px;border-radius:10px;background:var(--card);color:var(--text);min-width:150px;border:2px solid var(--border);">
-        <option value="0">Pagi 1</option>
-        <option value="1">Pagi 2</option>
-        <option value="2">Sore 1</option>
-        <option value="3">Sore 2</option>
-        <option value="4">Malam 1</option>
-        <option value="5">Malam 2</option>
-        <option value="6">Libur 1</option>
-        <option value="7">Libur 2</option>
-      </select>
-    </label>
-    <label style="display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-weight:700;">👥 Grup D</span>
-      <select id="shiftD" style="padding:8px 12px;border-radius:10px;background:var(--card);color:var(--text);min-width:150px;border:2px solid var(--border);">
-        <option value="0">Pagi 1</option>
-        <option value="1">Pagi 2</option>
-        <option value="2">Sore 1</option>
-        <option value="3">Sore 2</option>
-        <option value="4">Malam 1</option>
-        <option value="5">Malam 2</option>
-        <option value="6">Libur 1</option>
-        <option value="7">Libur 2</option>
-      </select>
-    </label>
-  </div>
-  
-  <div style="margin-top:25px;padding-top:20px;border-top:2px solid var(--border);">
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <button onclick="closeShiftModal()">❌ Batal</button>
-      <div style="display:flex;gap:10px;">
-        <button onclick="resetShiftToDefault()" style="background:transparent;border:2px solid var(--border);">🔄 Reset ke Default</button>
-        <button class="primary" onclick="saveShift()">💾 Simpan Setting</button>
-      </div>
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <canvas id="hdrCanvas" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
+  <div class="hdr-glow"></div>
+  <div class="hdr-body">
+    <div class="hdr-center">
+      <div class="hdr-eyebrow">— Jadwal Kerja —</div>
+      <div class="hdr-title">Shift &nbsp; 4 &nbsp; Grup</div>
+      <div class="hdr-divider"></div>
+      <div class="hdr-month" id="appMonth">PT. Motasa Indonesia</div>
     </div>
   </div>
 </div>
+
+<!-- ══ CONTROLS ══ -->
+<div class="ctrl">
+  <div class="ctrl-nav">
+    <button class="nav-btn" id="prevBtn">‹</button>
+    <div class="month-pick-wrap">
+      <div class="month-label" id="monthLabel">Mar 2026</div>
+      <input type="month" id="monthPick">
+    </div>
+    <button class="nav-btn" id="nextBtn">›</button>
+  </div>
+  <div class="ctrl-act">
+    <button class="ctrl-btn" onclick="openTheme()">
+      <div class="ctrl-btn-l"><span id="activeEmoji">🎨</span><span>Theme</span></div>
+      <span class="ctrl-btn-arr">›</span>
+    </button>
+    <button class="ctrl-btn" onclick="openShift()">
+      <div class="ctrl-btn-l"><span>⚙️</span><span>Custom Shift</span></div>
+      <span class="ctrl-btn-arr">›</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══ TABLE ══ -->
+<div class="table-card">
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Tanggal</th>
+          <th>A</th><th>B</th><th>C</th><th>D</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ PDF BTN ══ -->
+<button class="pdf-btn" id="pdfBtn" onclick="doPDF()">🖨️ Cetak / PDF</button>
+
+<div class="footer">Made with ❤️ by <b>Malfoy</b> · <span id="yr"></span></div>
+
+</div>
+
+<!-- ══ THEME SHEET ══ -->
+<div class="sheet-ov" id="themeOv" onclick="if(event.target===this)closeTheme()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Pilih Tema</div>
+    <div class="sheet-sub">Tampilan berubah otomatis</div>
+    <div class="sheet-divider"></div>
+    <div class="theme-grid">
+      <button class="tg on" data-t="default"><div class="tg-emoji">🎨</div><div class="tg-name">Default</div></button>
+      <button class="tg" data-t="snow"><div class="tg-emoji">❄️</div><div class="tg-name">Snow</div></button>
+      <button class="tg" data-t="halloween"><div class="tg-emoji">🎃</div><div class="tg-name">Halloween</div></button>
+      <button class="tg" data-t="forest"><div class="tg-emoji">🌿</div><div class="tg-name">Forest</div></button>
+      <button class="tg" data-t="islamic"><div class="tg-emoji">🌙</div><div class="tg-name">Islamic</div></button>
+      <button class="tg" data-t="space"><div class="tg-emoji">🚀</div><div class="tg-name">Space</div></button>
+      <button class="tg" data-t="xmas"><div class="tg-emoji">🎄</div><div class="tg-name">Christmas</div></button>
+      <button class="tg" data-t="dark"><div class="tg-emoji">🌑</div><div class="tg-name">Dark</div></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SHIFT SHEET ══ -->
+<div class="sheet-ov" id="shiftOv" onclick="if(event.target===this)closeShift()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Custom Shift</div>
+    <div class="sheet-sub" id="todayLbl">Atur posisi shift untuk hari ini</div>
+    <div class="sheet-divider"></div>
+    <div class="sg"><div class="sg-lbl"><div class="sg-dot" style="background:#F59E0B"></div>Grup A</div><select class="m-sel" id="sA"><option value="0">Pagi 1</option><option value="1">Pagi 2</option><option value="2">Sore 1</option><option value="3">Sore 2</option><option value="4">Malam 1</option><option value="5">Malam 2</option><option value="6">Libur 1</option><option value="7">Libur 2</option></select></div>
+    <div class="sg"><div class="sg-lbl"><div class="sg-dot" style="background:#3B82F6"></div>Grup B</div><select class="m-sel" id="sB"><option value="0">Pagi 1</option><option value="1">Pagi 2</option><option value="2">Sore 1</option><option value="3">Sore 2</option><option value="4">Malam 1</option><option value="5">Malam 2</option><option value="6">Libur 1</option><option value="7">Libur 2</option></select></div>
+    <div class="sg"><div class="sg-lbl"><div class="sg-dot" style="background:#8B5CF6"></div>Grup C</div><select class="m-sel" id="sC"><option value="0">Pagi 1</option><option value="1">Pagi 2</option><option value="2">Sore 1</option><option value="3">Sore 2</option><option value="4">Malam 1</option><option value="5">Malam 2</option><option value="6">Libur 1</option><option value="7">Libur 2</option></select></div>
+    <div class="sg"><div class="sg-lbl"><div class="sg-dot" style="background:#EF4444"></div>Grup D</div><select class="m-sel" id="sD"><option value="0">Pagi 1</option><option value="1">Pagi 2</option><option value="2">Sore 1</option><option value="3">Sore 2</option><option value="4">Malam 1</option><option value="5">Malam 2</option><option value="6">Libur 1</option><option value="7">Libur 2</option></select></div>
+    <div class="sheet-footer">
+      <button class="sh-btn" onclick="resetShift()">↺ Default</button>
+      <button class="sh-btn" onclick="closeShift()">Batal</button>
+      <button class="sh-btn primary" onclick="saveShift()">Simpan</button>
+    </div>
+  </div>
 </div>
 
 <script>
-// ===== KONSTANTA & VARIABEL =====
-const START_DATE = new Date(2025, 11, 22); // 22 Desember 2025
-const SHIFT_CYCLE = ["Pagi", "Pagi", "Sore", "Sore", "Malam", "Malam", "Libur", "Libur"];
-const OFFSETS = { A: 6, B: 4, C: 2, D: 0 }; // Offset untuk 22 Des 2025
-
-// ===== VARIABEL GLOBAL =====
-let currentYear, currentMonth;
-let HOLIDAYS = {};
-let scrolled = false;
-let selectedDateKey = null;
-let renderTimeout = null;
-
-// Hitung default shift dari START_DATE untuk hari ini
-function calculateDefaultShift() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  const startDate = new Date(START_DATE);
-  startDate.setHours(0, 0, 0, 0);
-  
-  // Hitung selisih hari dari START_DATE ke hari ini
-  const diffMs = today.getTime() - startDate.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  
-  // Hitung shift index untuk tiap grup
-  const result = {};
-  ["A", "B", "C", "D"].forEach(grup => {
-    let shiftIndex = (OFFSETS[grup] + diffDays) % 8;
-    if (shiftIndex < 0) shiftIndex += 8;
-    
-    result[grup] = shiftIndex;
-  });
-  
-  console.log("Default shift calculated:", result);
-  return result;
+/* ══════════════════════════════════════════
+   HEADER CANVAS — cinematic painted worlds
+══════════════════════════════════════════ */
+function renderIllus(theme) {
+  const canvas = document.getElementById('hdrCanvas');
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const W = rect.width  || canvas.offsetWidth  || 480;
+  const H = rect.height || canvas.offsetHeight || 180;
+  canvas.width  = W * (window.devicePixelRatio || 1);
+  canvas.height = H * (window.devicePixelRatio || 1);
+  const ctx = canvas.getContext('2d');
+  ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+  ctx.clearRect(0, 0, W, H);
+  const fn = PAINTERS[theme] || PAINTERS.default;
+  fn(ctx, W, H);
 }
 
-// Setting awal (dihitung dari START_DATE)
-let BASE_SHIFT = JSON.parse(localStorage.getItem("baseShift")) || calculateDefaultShift();
+const PAINTERS = {
 
-// ===== FUNGSI UTAMA: HITUNG SHIFT =====
-function getShiftForDate(grup, targetDate) {
-  try {
-    // Jika BASE_SHIFT tersimpan di localStorage, gunakan itu sebagai patokan
-    // Jika tidak, hitung langsung dari START_DATE
-    
-    const startDate = new Date(START_DATE);
-    startDate.setHours(0, 0, 0, 0);
-    
-    const target = new Date(targetDate);
-    target.setHours(0, 0, 0, 0);
-    
-    let targetIndex;
-    
-    if (Object.keys(BASE_SHIFT).length > 0 && localStorage.getItem("baseShift") !== null) {
-      // Mode: gunakan BASE_SHIFT sebagai patokan (Custom Shift)
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      // Hitung selisih hari antara targetDate dengan hari ini
-      const diffMs = target.getTime() - today.getTime();
-      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      
-      // Hitung shift index untuk tanggal target
-      targetIndex = (BASE_SHIFT[grup] + diffDays) % 8;
-    } else {
-      // Mode: hitung langsung dari START_DATE (Default)
-      // Hitung selisih hari antara targetDate dengan START_DATE
-      const diffMs = target.getTime() - startDate.getTime();
-      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      
-      // Hitung shift index untuk tanggal target
-      targetIndex = (OFFSETS[grup] + diffDays) % 8;
+  /* ─────────────────────────────────────
+     DEFAULT — purple dusk, soft clouds
+  ───────────────────────────────────── */
+  default(ctx, W, H) {
+    // sky
+    const sky = ctx.createLinearGradient(0,0,0,H);
+    sky.addColorStop(0,   '#2D1B4E');
+    sky.addColorStop(0.4, '#6B3FA0');
+    sky.addColorStop(0.75,'#C878C8');
+    sky.addColorStop(1,   '#F0C0E8');
+    ctx.fillStyle = sky; ctx.fillRect(0,0,W,H);
+    // moon glow
+    const mg = ctx.createRadialGradient(W*.78,H*.22,2, W*.78,H*.22,55);
+    mg.addColorStop(0,'rgba(255,245,200,1)');
+    mg.addColorStop(0.15,'rgba(255,230,150,.8)');
+    mg.addColorStop(0.5,'rgba(200,150,220,.3)');
+    mg.addColorStop(1,'transparent');
+    ctx.fillStyle = mg; ctx.fillRect(0,0,W,H);
+    // moon
+    ctx.beginPath(); ctx.arc(W*.78,H*.22,14,0,Math.PI*2);
+    ctx.fillStyle='#FFF8DC'; ctx.fill();
+    ctx.beginPath(); ctx.arc(W*.78+7,H*.22-5,11,0,Math.PI*2);
+    ctx.fillStyle='#6B3FA0'; ctx.fill();
+    // clouds
+    function cloud(x,y,s,a){
+      ctx.save(); ctx.globalAlpha=a;
+      ctx.fillStyle='rgba(255,255,255,1)';
+      ctx.filter='blur(8px)';
+      ctx.beginPath(); ctx.ellipse(x,y,s*1.6,s*.55,0,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x-s*.5,y+s*.1,s*.9,s*.45,0,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x+s*.6,y+s*.05,s*.8,s*.4,0,0,Math.PI*2); ctx.fill();
+      ctx.restore();
     }
-    
-    if (targetIndex < 0) targetIndex += 8;
-    
-    // Tentukan apakah "pertama" atau "kedua"
-    const shiftType = SHIFT_CYCLE[targetIndex];
-    const firstIndex = SHIFT_CYCLE.indexOf(shiftType);
-    const isSecond = targetIndex === firstIndex + 1;
-    
-    return isSecond ? `${shiftType} 2` : `${shiftType} 1`;
-  } catch (error) {
-    console.error("Error in getShiftForDate:", error);
-    return "Error";
-  }
-}
-
-// ===== THEME FUNCTIONS =====
-function initTheme() {
-  const savedTheme = localStorage.getItem("shiftTheme") || "default";
-  
-  // Remove all theme classes
-  document.body.classList.remove("theme-lebaran", "theme-natal", "theme-halloween", 
-                                "theme-luar-angkasa", "theme-musim-salju", "theme-dark");
-  
-  // Apply saved theme
-  if (savedTheme === "dark") {
-    document.body.classList.add("theme-dark");
-    document.getElementById("themeSelect").value = "dark";
-  } else if (savedTheme !== "default") {
-    document.body.classList.add(`theme-${savedTheme}`);
-    document.getElementById("themeSelect").value = savedTheme;
-  } else {
-    document.getElementById("themeSelect").value = "default";
-  }
-}
-
-function changeTheme(theme) {
-  // Remove all theme classes
-  document.body.classList.remove("theme-lebaran", "theme-natal", "theme-halloween", 
-                                "theme-luar-angkasa", "theme-musim-salju", "theme-dark");
-  
-  // Apply new theme
-  if (theme !== "default") {
-    document.body.classList.add(`theme-${theme}`);
-  }
-  
-  // Save to localStorage
-  localStorage.setItem("shiftTheme", theme);
-  
-  // Update select value
-  document.getElementById("themeSelect").value = theme;
-}
-
-// ===== HELPER FUNCTIONS =====
-function dateKey(d) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
-function updateMonthLabel() {
-  const monthName = new Date(currentYear, currentMonth).toLocaleDateString("id-ID", { 
-    month: "long", 
-    year: "numeric" 
-  });
-  document.getElementById("monthLabel").innerHTML = monthName;
-}
-
-function updateTodayDateLabel() {
-  const today = new Date();
-  const todayFormatted = today.toLocaleDateString("id-ID", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric"
-  });
-  document.getElementById("todayDateLabel").textContent = todayFormatted;
-}
-
-// ===== LOADING HOLIDAYS =====
-async function loadHolidays(year) {
-  const originalText = document.getElementById("monthLabel").textContent;
-  document.getElementById("monthLabel").textContent = "Memuat hari libur...";
-  
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
-    
-    const r = await fetch(`https://api-harilibur.vercel.app/api?year=${year}`, {
-      signal: controller.signal
+    cloud(W*.15,H*.28,32,.18); cloud(W*.35,H*.18,24,.12);
+    cloud(W*.6,H*.32,28,.15);
+    // stars
+    const stars=[[.05,.12],[.12,.06],[.22,.15],[.32,.08],[.45,.18],[.52,.05],[.62,.1]];
+    stars.forEach(([sx,sy])=>{
+      ctx.beginPath(); ctx.arc(sx*W,sy*H,1.1,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,220,.8)'; ctx.fill();
     });
-    
-    clearTimeout(timeoutId);
-    
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    
-    const d = await r.json();
-    HOLIDAYS = {};
-    d.forEach(i => i.is_national_holiday && (HOLIDAYS[i.holiday_date] = i.holiday_name));
-    
-  } catch (err) {
-    console.log("Gagal memuat hari libur:", err.message);
-    HOLIDAYS = {};
-  }
-  
-  updateMonthLabel();
-}
+    // hills
+    const hill = ctx.createLinearGradient(0,H*.7,0,H);
+    hill.addColorStop(0,'#3D1A5C'); hill.addColorStop(1,'#1A0A2E');
+    ctx.fillStyle=hill;
+    ctx.beginPath(); ctx.moveTo(0,H);
+    ctx.bezierCurveTo(W*.1,H*.65, W*.25,H*.55, W*.4,H*.72);
+    ctx.bezierCurveTo(W*.55,H*.88, W*.7,H*.6, W*.85,H*.7);
+    ctx.bezierCurveTo(W*.93,H*.75, W,H*.68, W,H*.72);
+    ctx.lineTo(W,H); ctx.closePath(); ctx.fill();
+  },
 
-// ===== RENDER FUNCTIONS =====
-function scheduleRender() {
-  if (renderTimeout) clearTimeout(renderTimeout);
-  renderTimeout = setTimeout(render, 50);
-}
+  /* ─────────────────────────────────────
+     ISLAMIC — senja masjid, atmospheric
+  ───────────────────────────────────── */
+  islamic(ctx, W, H) {
+    // sky gradient — deep blue top to burning orange horizon
+    const sky = ctx.createLinearGradient(0,0,0,H);
+    sky.addColorStop(0,   '#0A1020');
+    sky.addColorStop(0.25,'#1A2A50');
+    sky.addColorStop(0.5, '#8B3500');
+    sky.addColorStop(0.75,'#E86A00');
+    sky.addColorStop(0.88,'#F5A020');
+    sky.addColorStop(1,   '#FDD060');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
 
-function render() {
-  try {
-    console.log("Rendering table...");
-    const tableBody = document.getElementById("tableBody");
-    tableBody.innerHTML = "";
-    const todayKey = dateKey(new Date());
-    const days = new Date(currentYear, currentMonth + 1, 0).getDate();
-    
-    for (let d = 1; d <= days; d++) {
-      const date = new Date(currentYear, currentMonth, d);
-      const key = dateKey(date);
-      const tr = document.createElement("tr");
-      
-      if (key === todayKey) tr.classList.add("today");
-      if (key === selectedDateKey) tr.classList.add("selected");
-      
-      tr.onclick = () => {
-        selectedDateKey = (selectedDateKey === key) ? null : key;
-        scheduleRender();
+    // sun glow at horizon right
+    const sun = ctx.createRadialGradient(W*.72,H,0, W*.72,H,H*.95);
+    sun.addColorStop(0,   'rgba(255,240,150,.95)');
+    sun.addColorStop(0.08,'rgba(255,200,80,.7)');
+    sun.addColorStop(0.22,'rgba(240,130,20,.4)');
+    sun.addColorStop(0.5, 'rgba(200,80,0,.15)');
+    sun.addColorStop(1,   'transparent');
+    ctx.fillStyle=sun; ctx.fillRect(0,0,W,H);
+
+    // second warm glow spread
+    const glow2 = ctx.createRadialGradient(W*.5,H,0, W*.5,H,W*.7);
+    glow2.addColorStop(0,  'rgba(255,180,60,.35)');
+    glow2.addColorStop(0.4,'rgba(220,100,20,.15)');
+    glow2.addColorStop(1,  'transparent');
+    ctx.fillStyle=glow2; ctx.fillRect(0,0,W,H);
+
+    // atmospheric haze bands near horizon
+    ctx.save(); ctx.filter='blur(12px)';
+    ctx.fillStyle='rgba(255,200,80,.12)';
+    ctx.fillRect(0, H*.62, W, H*.22);
+    ctx.fillStyle='rgba(255,160,40,.08)';
+    ctx.fillRect(0, H*.72, W, H*.2);
+    ctx.restore();
+
+    // crescent moon — top left
+    ctx.save();
+    // moon glow
+    const mg = ctx.createRadialGradient(W*.14,H*.18,0, W*.14,H*.18,28);
+    mg.addColorStop(0,'rgba(255,240,160,.5)');
+    mg.addColorStop(1,'transparent');
+    ctx.fillStyle=mg; ctx.fillRect(0,0,W,H);
+    // moon body
+    ctx.beginPath(); ctx.arc(W*.14,H*.18,11,0,Math.PI*2);
+    ctx.fillStyle='#FFE8A0'; ctx.fill();
+    // shadow to make crescent
+    ctx.beginPath(); ctx.arc(W*.14+6,H*.18-4,9,0,Math.PI*2);
+    ctx.fillStyle='#1A2A50'; ctx.fill();
+    ctx.restore();
+
+    // stars
+    const strs=[[.04,.08],[.09,.04],[.18,.12],[.28,.06],[.38,.14],[.48,.04],[.55,.1],[.06,.22],[.22,.26],[.32,.2]];
+    strs.forEach(([sx,sy],i)=>{
+      const r = i%3===0?1.4:i%3===1?.9:.6;
+      ctx.beginPath(); ctx.arc(sx*W,sy*H,r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,200,${.5+i%3*.15})`; ctx.fill();
+    });
+
+    // ── distant city haze (blurred mid layer) ──
+    ctx.save(); ctx.filter='blur(4px)'; ctx.globalAlpha=.45;
+    const distHill = ctx.createLinearGradient(0,H*.7,0,H);
+    distHill.addColorStop(0,'rgba(40,15,0,.0)');
+    distHill.addColorStop(1,'rgba(20,5,0,.9)');
+    ctx.fillStyle=distHill;
+    // rolling distant hills
+    ctx.beginPath(); ctx.moveTo(0,H);
+    ctx.bezierCurveTo(W*.08,H*.75, W*.18,H*.68, W*.28,H*.74);
+    ctx.bezierCurveTo(W*.38,H*.8,  W*.48,H*.7,  W*.58,H*.76);
+    ctx.bezierCurveTo(W*.68,H*.82, W*.8,H*.72,  W,H*.78);
+    ctx.lineTo(W,H); ctx.closePath(); ctx.fill();
+    // tiny distant domes
+    [[.3,.7],[.45,.67],[.6,.72],[.72,.69]].forEach(([dx,dy])=>{
+      ctx.beginPath(); ctx.arc(dx*W,dy*H,6,Math.PI,0); ctx.fillRect(dx*W-4,dy*H,8,10); ctx.fill();
+    });
+    ctx.restore();
+
+    // ── MAIN MOSQUE SILHOUETTE ──
+    ctx.save();
+    const mosqueColor = '#120500';
+    const mc2 = '#0A0200';
+    ctx.fillStyle = mosqueColor;
+
+    // ground
+    ctx.fillStyle='#0A0200';
+    ctx.fillRect(0, H*.88, W, H*.12);
+
+    // ground warm glow
+    ctx.save(); ctx.filter='blur(6px)';
+    ctx.fillStyle='rgba(200,90,10,.22)';
+    ctx.fillRect(0,H*.84,W,H*.1);
+    ctx.restore();
+
+    ctx.fillStyle = mosqueColor;
+
+    // left palm tree trunk
+    ctx.save();
+    ctx.strokeStyle='#150600'; ctx.lineWidth=4; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(W*.06,H); ctx.quadraticCurveTo(W*.04,H*.6,W*.03,H*.38); ctx.stroke();
+    // fronds
+    [[-.12,-.15],[-.05,-.2],[.04,-.18],[.1,-.12],[.13,-.06],[-.14,-.08]].forEach(([dx,dy])=>{
+      ctx.beginPath();
+      ctx.moveTo(W*.03,H*.38);
+      ctx.quadraticCurveTo(W*(.03+dx*.5),H*(.38+dy*.5),W*(.03+dx),H*(.38+dy));
+      ctx.lineWidth=2.5; ctx.stroke();
+      // leaf tip
+      ctx.save(); ctx.filter='blur(.5px)';
+      ctx.beginPath(); ctx.ellipse(W*(.03+dx),H*(.38+dy),5,2.5,Math.atan2(dy,dx),0,Math.PI*2);
+      ctx.fillStyle='#150600'; ctx.fill();
+      ctx.restore();
+    });
+    ctx.restore();
+
+    // mosque base
+    const mX = W*.42, mW = W*.38, mY = H*.42;
+
+    // main body
+    ctx.fillStyle=mosqueColor;
+    ctx.fillRect(mX, H*.72, mW, H*.16);
+
+    // main dome
+    ctx.beginPath();
+    ctx.moveTo(mX+mW*.18, H*.72);
+    ctx.bezierCurveTo(mX+mW*.18,H*.42, mX+mW*.82,H*.42, mX+mW*.82,H*.72);
+    ctx.fill();
+
+    // drum
+    ctx.fillRect(mX+mW*.22, H*.7, mW*.6, H*.04);
+
+    // side domes
+    ctx.beginPath();
+    ctx.moveTo(mX+mW*.03,H*.72);
+    ctx.bezierCurveTo(mX+mW*.03,H*.57, mX+mW*.22,H*.57, mX+mW*.22,H*.72);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(mX+mW*.78,H*.72);
+    ctx.bezierCurveTo(mX+mW*.78,H*.57, mX+mW*.97,H*.57, mX+mW*.97,H*.72);
+    ctx.fill();
+
+    // entrance arch
+    ctx.fillStyle=mc2;
+    ctx.beginPath();
+    ctx.moveTo(mX+mW*.38,H*.88);
+    ctx.lineTo(mX+mW*.38,H*.78);
+    ctx.quadraticCurveTo(mX+mW*.5,H*.72, mX+mW*.62,H*.78);
+    ctx.lineTo(mX+mW*.62,H*.88);
+    ctx.fill();
+
+    // side windows
+    [[.12,.78,.2,.84],[.8,.78,.88,.84]].forEach(([x1,y1,x2,y2])=>{
+      ctx.beginPath();
+      ctx.moveTo(mX+mW*x1, H*y2);
+      ctx.lineTo(mX+mW*x1, H*(y1+.02));
+      ctx.quadraticCurveTo(mX+mW*((x1+x2)/2),H*(y1-.01),mX+mW*x2,H*(y1+.02));
+      ctx.lineTo(mX+mW*x2, H*y2);
+      ctx.fillStyle=mc2; ctx.fill();
+    });
+
+    ctx.fillStyle=mosqueColor;
+    // LEFT minaret
+    const lmX = mX - mW*.08;
+    ctx.fillRect(lmX, H*.32, W*.022, H*.56);
+    // minaret top cap
+    ctx.beginPath(); ctx.moveTo(lmX-2, H*.32);
+    ctx.lineTo(lmX+W*.011, H*.22);
+    ctx.lineTo(lmX+W*.022+2, H*.32); ctx.fill();
+    // minaret balcony
+    ctx.fillRect(lmX-3, H*.48, W*.022+6, H*.02);
+    // finial
+    ctx.beginPath(); ctx.arc(lmX+W*.011, H*.2, 3, 0, Math.PI*2); ctx.fill();
+    ctx.fillRect(lmX+W*.009, H*.14, 3, H*.07);
+    // crescent on minaret
+    ctx.beginPath(); ctx.arc(lmX+W*.011+1,H*.13,3.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=mc2;
+    ctx.beginPath(); ctx.arc(lmX+W*.011+3,H*.12,2.8,0,Math.PI*2); ctx.fill();
+
+    ctx.fillStyle=mosqueColor;
+    // RIGHT minaret
+    const rmX = mX + mW + mW*.06 - W*.022;
+    ctx.fillRect(rmX, H*.32, W*.022, H*.56);
+    ctx.beginPath(); ctx.moveTo(rmX-2,H*.32);
+    ctx.lineTo(rmX+W*.011,H*.22);
+    ctx.lineTo(rmX+W*.022+2,H*.32); ctx.fill();
+    ctx.fillRect(rmX-3, H*.48, W*.022+6, H*.02);
+    ctx.beginPath(); ctx.arc(rmX+W*.011,H*.2,3,0,Math.PI*2); ctx.fill();
+    ctx.fillRect(rmX+W*.009,H*.14,3,H*.07);
+    ctx.beginPath(); ctx.arc(rmX+W*.011+1,H*.13,3.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=mc2;
+    ctx.beginPath(); ctx.arc(rmX+W*.011+3,H*.12,2.8,0,Math.PI*2); ctx.fill();
+
+    // main dome finial + crescent
+    ctx.fillStyle=mosqueColor;
+    ctx.fillRect(mX+mW*.49, H*.3, 3, H*.13);
+    ctx.beginPath(); ctx.arc(mX+mW*.5,H*.28,4,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(mX+mW*.5+1,H*.25,4.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=mc2;
+    ctx.beginPath(); ctx.arc(mX+mW*.5+3,H*.24,3.6,0,Math.PI*2); ctx.fill();
+
+    ctx.restore();
+
+    // final horizon overlay glow
+    ctx.save(); ctx.filter='blur(18px)';
+    ctx.fillStyle='rgba(240,150,30,.18)';
+    ctx.fillRect(0,H*.75,W,H*.25);
+    ctx.restore();
+  },
+
+  /* ─────────────────────────────────────
+     SNOW — winter forest, bokeh, sun glow
+  ───────────────────────────────────── */
+  snow(ctx, W, H) {
+    // sky — bright icy blue teal top, white glow bottom-right
+    const sky = ctx.createLinearGradient(0,0,W,H);
+    sky.addColorStop(0,   '#2A6090');
+    sky.addColorStop(0.3, '#4A90B8');
+    sky.addColorStop(0.65,'#88C8DC');
+    sky.addColorStop(1,   '#C8E8F0');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+
+    // sun glow — bright right side
+    const sun = ctx.createRadialGradient(W*.88, H*.3, 0, W*.88, H*.3, W*.6);
+    sun.addColorStop(0,   'rgba(255,255,255,.95)');
+    sun.addColorStop(0.08,'rgba(240,252,255,.7)');
+    sun.addColorStop(0.25,'rgba(200,238,248,.35)');
+    sun.addColorStop(0.6, 'rgba(160,210,235,.1)');
+    sun.addColorStop(1,   'transparent');
+    ctx.fillStyle=sun; ctx.fillRect(0,0,W,H);
+
+    // soft clouds mid-sky
+    ctx.save(); ctx.filter='blur(14px)'; ctx.globalAlpha=.3;
+    ctx.fillStyle='rgba(255,255,255,1)';
+    [[.15,.3,55],[.42,.22,42],[.65,.28,48],[.82,.18,38]].forEach(([cx,cy,r])=>{
+      ctx.beginPath(); ctx.ellipse(cx*W,cy*H,r*2,r*.6,0,0,Math.PI*2); ctx.fill();
+    });
+    ctx.restore();
+
+    // bokeh circles — blurred light orbs
+    ctx.save(); ctx.filter='blur(5px)';
+    const bokehs = [
+      [.18,.15,.022,.7],[.32,.08,.016,.55],[.48,.2,.02,.65],[.6,.1,.018,.5],
+      [.72,.18,.025,.6],[.85,.08,.014,.45],[.12,.32,.012,.4],[.55,.28,.015,.5],
+      [.4,.35,.01,.35],[.78,.32,.013,.4],[.25,.42,.011,.35],[.9,.25,.016,.45],
+    ];
+    bokehs.forEach(([bx,by,br,ba])=>{
+      ctx.beginPath(); ctx.arc(bx*W, by*H, br*W, 0, Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${ba})`; ctx.fill();
+    });
+    ctx.restore();
+
+    // snowflake sparkles (star shape)
+    [[.08,.12],[.22,.06],[.38,.14],[.55,.07],[.68,.16],[.15,.22],[.42,.25],[.78,.1]].forEach(([sx,sy],i)=>{
+      const x=sx*W, y=sy*H, s=2.5+i%3*.8;
+      ctx.save(); ctx.translate(x,y); ctx.strokeStyle=`rgba(255,255,255,${.7+i%3*.1})`; ctx.lineWidth=1.2;
+      for(let a=0;a<4;a++){
+        ctx.save(); ctx.rotate(a*Math.PI/4);
+        ctx.beginPath(); ctx.moveTo(0,-s); ctx.lineTo(0,s); ctx.stroke();
+        ctx.restore();
       }
-      
-      const tdDate = document.createElement("td");
-      const dayName = date.toLocaleDateString("id-ID", { weekday: "short" });
-      const dayNumber = String(date.getDate()).padStart(2, "0");
-      tdDate.innerHTML = `<strong>${dayName}, ${dayNumber}</strong>`;
-      
-      if (HOLIDAYS[key]) {
-        tdDate.innerHTML += `<span class="holiday-note">🎉 ${HOLIDAYS[key]}</span>`;
-      }
-      
-      if (date.getDay() === 0) tdDate.classList.add("sunday");
-      
-      tr.appendChild(tdDate);
-      
-      ["A", "B", "C", "D"].forEach(grup => {
-        const td = document.createElement("td");
-        const shift = getShiftForDate(grup, date);
-        const shiftType = shift.split(" ")[0].toLowerCase();
-        td.innerHTML = `<span class="badge ${shiftType}">${shift}</span>`;
-        tr.appendChild(td);
+      // center dot
+      ctx.beginPath(); ctx.arc(0,0,1,0,Math.PI*2); ctx.fillStyle='white'; ctx.fill();
+      ctx.restore();
+    });
+
+    // ── BACKGROUND pine trees (blurred, icy)
+    ctx.save(); ctx.filter='blur(3px)'; ctx.globalAlpha=.55;
+    function snowPine(x, h, w, col='rgba(160,210,230,.9)'){
+      ctx.fillStyle=col;
+      ctx.beginPath(); ctx.moveTo(x,H); ctx.lineTo(x,H-h*.2);
+      ctx.lineTo(x-w*.45,H-h*.22); ctx.lineTo(x,H-h*.44);
+      ctx.lineTo(x-w*.35,H-h*.46); ctx.lineTo(x,H-h*.66);
+      ctx.lineTo(x-w*.22,H-h*.68); ctx.lineTo(x,H-h);
+      ctx.lineTo(x+w*.22,H-h*.68); ctx.lineTo(x+w*.35,H-h*.66);
+      ctx.lineTo(x,H-h*.46); ctx.lineTo(x+w*.45,H-h*.44);
+      ctx.lineTo(x,H-h*.22); ctx.lineTo(x+w*.45,H-h*.22);
+      ctx.lineTo(x,H); ctx.fill();
+      // snow on each tier
+      ctx.fillStyle='rgba(255,255,255,.85)';
+      [[1,.16],[.72,.38],[.45,.6],[.22,.76]].forEach(([tw,ty])=>{
+        ctx.beginPath(); ctx.moveTo(x,H-h*ty);
+        ctx.lineTo(x-w*tw*.38,H-h*(ty+.12));
+        ctx.lineTo(x+w*tw*.38,H-h*(ty+.12));
+        ctx.fill();
       });
-      
-      tableBody.appendChild(tr);
-      
-      if (!scrolled && key === todayKey) {
-        setTimeout(() => {
-          tr.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
-          });
-        }, 300);
-        scrolled = true;
+    }
+    snowPine(-W*.02,H*.72,28,'rgba(140,195,218,.8)');
+    snowPine(W*.08, H*.62,22,'rgba(150,200,222,.8)');
+    snowPine(W*.78, H*.68,24,'rgba(140,195,218,.8)');
+    snowPine(W*.9,  H*.58,20,'rgba(150,200,222,.8)');
+    snowPine(W*.97, H*.66,18,'rgba(140,195,218,.75)');
+    ctx.restore();
+
+    // ── FOREGROUND pine trees (crisp, darker blue-white)
+    function frontPine(x, h, w){
+      ctx.fillStyle='rgba(80,140,175,.95)';
+      ctx.beginPath(); ctx.moveTo(x,H); ctx.lineTo(x,H-h*.18);
+      ctx.lineTo(x-w*.48,H-h*.2); ctx.lineTo(x,H-h*.42);
+      ctx.lineTo(x-w*.38,H-h*.44); ctx.lineTo(x,H-h*.65);
+      ctx.lineTo(x-w*.25,H-h*.67); ctx.lineTo(x,H-h);
+      ctx.lineTo(x+w*.25,H-h*.67); ctx.lineTo(x+w*.38,H-h*.65);
+      ctx.lineTo(x,H-h*.44); ctx.lineTo(x+w*.48,H-h*.42);
+      ctx.lineTo(x,H-h*.2); ctx.lineTo(x+w*.48,H-h*.2);
+      ctx.lineTo(x,H); ctx.fill();
+      // heavy snow on tiers
+      ctx.fillStyle='rgba(230,245,255,.95)';
+      [[1,.14,.42],[.72,.34,.35],[.45,.56,.26],[.22,.74,.16]].forEach(([tw,ty,cov])=>{
+        ctx.beginPath(); ctx.moveTo(x,H-h*ty);
+        ctx.lineTo(x-w*cov*1.1, H-h*(ty+.14));
+        ctx.lineTo(x+w*cov*1.1, H-h*(ty+.14));
+        ctx.fill();
+      });
+    }
+    frontPine(-W*.04, H*.88, 32);
+    frontPine(W*.14,  H*.78, 26);
+    frontPine(W*.84,  H*.82, 28);
+    frontPine(W*1.02, H*.9,  30);
+
+    // falling snow particles
+    for(let i=0;i<30;i++){
+      const x=(i*83+17)%W, y=(i*47+9)%(H*.82)+5;
+      const r=.8+((i*11)%4)*.35, a=.35+((i*7)%5)*.1;
+      ctx.save(); ctx.filter='blur(.5px)';
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${a})`; ctx.fill();
+      ctx.restore();
+    }
+
+    // snow ground — wide, bright, slightly bumpy
+    const sg=ctx.createLinearGradient(0,H*.72,0,H);
+    sg.addColorStop(0,'rgba(200,232,245,.0)');
+    sg.addColorStop(0.3,'rgba(220,240,252,.85)');
+    sg.addColorStop(1,'rgba(245,252,255,1)');
+    ctx.fillStyle=sg;
+    ctx.beginPath(); ctx.moveTo(0,H);
+    ctx.bezierCurveTo(W*.18,H*.75, W*.38,H*.8,  W*.55,H*.74);
+    ctx.bezierCurveTo(W*.72,H*.68, W*.88,H*.76, W,H*.72);
+    ctx.lineTo(W,H); ctx.fill();
+
+    // mist at tree base
+    ctx.save(); ctx.filter='blur(12px)'; ctx.globalAlpha=.3;
+    ctx.fillStyle='rgba(200,235,248,1)';
+    ctx.fillRect(0,H*.62,W,H*.18); ctx.restore();
+  },
+
+  /* ─────────────────────────────────────
+     HALLOWEEN — dark night, castle
+  ───────────────────────────────────── */
+  halloween(ctx, W, H) {
+    const sky=ctx.createLinearGradient(0,0,0,H);
+    sky.addColorStop(0,'#050200'); sky.addColorStop(0.4,'#2A0D00');
+    sky.addColorStop(0.75,'#7A2800'); sky.addColorStop(1,'#C05000');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+    // big moon
+    const mg=ctx.createRadialGradient(W*.72,H*.22,0,W*.72,H*.22,60);
+    mg.addColorStop(0,'rgba(255,200,80,.7)'); mg.addColorStop(1,'transparent');
+    ctx.fillStyle=mg; ctx.fillRect(0,0,W,H);
+    ctx.beginPath(); ctx.arc(W*.72,H*.22,26,0,Math.PI*2);
+    ctx.fillStyle='#FF9A00'; ctx.fill();
+    ctx.beginPath(); ctx.arc(W*.72,H*.22,22,0,Math.PI*2);
+    ctx.fillStyle='#FFB020'; ctx.fill();
+    // moon craters
+    ctx.fillStyle='rgba(180,80,0,.25)';
+    [[-.3,-.2,4],[.2,.3,3],[-.1,.1,2.5]].forEach(([dx,dy,r])=>{
+      ctx.beginPath(); ctx.arc(W*.72+dx*22,H*.22+dy*22,r,0,Math.PI*2); ctx.fill();
+    });
+    // bats
+    [[.25,.18],[.4,.12],[.55,.22],[.15,.3]].forEach(([bx,by],i)=>{
+      ctx.save(); ctx.translate(bx*W,by*H); ctx.fillStyle='#0D0500';
+      const s=i%2===0?.7:1;
+      ctx.beginPath();
+      ctx.moveTo(0,0); ctx.bezierCurveTo(-6*s,-8*s,-14*s,-6*s,-18*s,0);
+      ctx.bezierCurveTo(-14*s,4*s,-8*s,2*s,0,0);
+      ctx.bezierCurveTo(8*s,2*s,14*s,4*s,18*s,0);
+      ctx.bezierCurveTo(14*s,-6*s,6*s,-8*s,0,0);
+      ctx.fill(); ctx.restore();
+    });
+    // stars
+    for(let i=0;i<18;i++){
+      ctx.beginPath(); ctx.arc(((i*83+7)%W), ((i*47+11)%(H*.6))+5, .7+i%3*.3, 0, Math.PI*2);
+      ctx.fillStyle=`rgba(255,180,50,${.3+i%4*.1})`; ctx.fill();
+    }
+    // castle silhouette
+    ctx.fillStyle='#080200';
+    // castle body
+    ctx.fillRect(W*.32,H*.45,W*.36,H*.55);
+    // battlements
+    for(let i=0;i<7;i++) ctx.fillRect(W*(.32+i*.052),H*.38,W*.032,H*.09);
+    // towers
+    ctx.fillRect(W*.28,H*.35,W*.08,H*.65);
+    ctx.fillRect(W*.64,H*.35,W*.08,H*.65);
+    for(let i=0;i<3;i++) ctx.fillRect(W*(.28+i*.027),H*.28,W*.024,H*.09);
+    for(let i=0;i<3;i++) ctx.fillRect(W*(.64+i*.027),H*.28,W*.024,H*.09);
+    // windows glow
+    ctx.fillStyle='rgba(255,150,0,.45)';
+    [[.42,.52],[.52,.52],[.42,.62],[.52,.62]].forEach(([wx,wy])=>{
+      ctx.beginPath(); ctx.arc(wx*W,wy*H,4,Math.PI,0); ctx.fillRect(wx*W-4,wy*H,8,8); ctx.fill();
+    });
+    // ground
+    ctx.fillStyle='#050100';
+    ctx.beginPath(); ctx.moveTo(0,H);
+    ctx.bezierCurveTo(W*.2,H*.82,W*.4,H*.88,W*.6,H*.82);
+    ctx.bezierCurveTo(W*.8,H*.78,W,H*.85,W,H); ctx.fill();
+  },
+
+  /* ─────────────────────────────────────
+     FOREST — moonlit trees, mist
+  ───────────────────────────────────── */
+  forest(ctx, W, H) {
+    const sky=ctx.createLinearGradient(0,0,0,H);
+    sky.addColorStop(0,'#0A1A0A'); sky.addColorStop(0.4,'#1A3A1A');
+    sky.addColorStop(0.75,'#2A5A28'); sky.addColorStop(1,'#3A6A30');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+    // moon glow
+    const mg=ctx.createRadialGradient(W*.18,H*.18,0,W*.18,H*.18,55);
+    mg.addColorStop(0,'rgba(255,255,220,.65)'); mg.addColorStop(1,'transparent');
+    ctx.fillStyle=mg; ctx.fillRect(0,0,W,H);
+    ctx.beginPath(); ctx.arc(W*.18,H*.18,18,0,Math.PI*2);
+    ctx.fillStyle='#FFFCE8'; ctx.fill();
+    // stars
+    for(let i=0;i<16;i++){
+      ctx.beginPath(); ctx.arc(((i*89+13)%W),((i*41+7)%(H*.55))+5,.8+i%3*.3,0,Math.PI*2);
+      ctx.fillStyle=`rgba(200,255,200,${.35+i%4*.1})`; ctx.fill();
+    }
+    // mist
+    ctx.save(); ctx.filter='blur(16px)'; ctx.globalAlpha=.25;
+    ctx.fillStyle='#80C880';
+    ctx.beginPath(); ctx.ellipse(W*.3,H*.78,W*.4,H*.15,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(W*.75,H*.82,W*.35,H*.12,0,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+    // back trees
+    ctx.save(); ctx.filter='blur(2.5px)'; ctx.globalAlpha=.55;
+    ctx.fillStyle='#0D2010';
+    function tree(x,h,w){
+      ctx.beginPath(); ctx.moveTo(x,H); ctx.lineTo(x,H-h*.3);
+      ctx.lineTo(x-w*.5,H-h*.3); ctx.lineTo(x,H-h*.7);
+      ctx.lineTo(x-w*.35,H-h*.7); ctx.lineTo(x,H-h);
+      ctx.lineTo(x+w*.35,H-h*.7); ctx.lineTo(x+w*.5,H-h*.7);
+      ctx.lineTo(x,H-h*.3); ctx.lineTo(x+w*.5,H-h*.3); ctx.lineTo(x,H); ctx.fill();
+    }
+    [W*.15,W*.3,W*.45,W*.6,W*.75,W*.88].forEach((x,i)=>tree(x,H*(.55+i%3*.08),(18+i%3*5)));
+    ctx.restore();
+    // front trees
+    ctx.fillStyle='#060E06';
+    [[W*.05,H*.72,16],[W*.22,H*.78,14],[W*.72,H*.75,15],[W*.88,H*.8,13]].forEach(([x,h,w])=>{
+      ctx.beginPath(); ctx.moveTo(x,H); ctx.lineTo(x,H-h*.35);
+      ctx.lineTo(x-w,H-h*.35); ctx.lineTo(x,H-h*.72);
+      ctx.lineTo(x-w*.7,H-h*.72); ctx.lineTo(x,H-h);
+      ctx.lineTo(x+w*.7,H-h*.72); ctx.lineTo(x+w,H-h*.35);
+      ctx.lineTo(x,H-h*.35); ctx.lineTo(x+w,H-h*.35); ctx.lineTo(x,H); ctx.fill();
+    });
+    // ground
+    const grd=ctx.createLinearGradient(0,H*.85,0,H);
+    grd.addColorStop(0,'#0A1A0A'); grd.addColorStop(1,'#050A05');
+    ctx.fillStyle=grd; ctx.fillRect(0,H*.85,W,H*.15);
+  },
+
+  /* ─────────────────────────────────────
+     SPACE — nebula, planet, stars
+  ───────────────────────────────────── */
+  space(ctx, W, H) {
+    ctx.fillStyle='#08041A'; ctx.fillRect(0,0,W,H);
+    // nebula layers
+    const neb1=ctx.createRadialGradient(W*.7,H*.3,0,W*.7,H*.3,W*.6);
+    neb1.addColorStop(0,'rgba(140,80,220,.28)'); neb1.addColorStop(1,'transparent');
+    ctx.fillStyle=neb1; ctx.fillRect(0,0,W,H);
+    const neb2=ctx.createRadialGradient(W*.2,H*.6,0,W*.2,H*.6,W*.5);
+    neb2.addColorStop(0,'rgba(180,60,160,.18)'); neb2.addColorStop(1,'transparent');
+    ctx.fillStyle=neb2; ctx.fillRect(0,0,W,H);
+    const neb3=ctx.createRadialGradient(W*.5,H*.1,0,W*.5,H*.1,W*.4);
+    neb3.addColorStop(0,'rgba(80,60,200,.15)'); neb3.addColorStop(1,'transparent');
+    ctx.fillStyle=neb3; ctx.fillRect(0,0,W,H);
+    // stars
+    for(let i=0;i<60;i++){
+      const x=(i*97+13)%W, y=(i*53+7)%H, r=.3+((i*7)%5)*.2;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${.3+i%5*.13})`; ctx.fill();
+    }
+    // bright stars
+    [[.15,.12],[.42,.08],[.78,.2],[.6,.45],[.88,.35]].forEach(([sx,sy])=>{
+      ctx.save();
+      const sg=ctx.createRadialGradient(sx*W,sy*H,0,sx*W,sy*H,6);
+      sg.addColorStop(0,'rgba(255,255,255,.9)'); sg.addColorStop(1,'transparent');
+      ctx.fillStyle=sg; ctx.fillRect(0,0,W,H);
+      ctx.beginPath(); ctx.arc(sx*W,sy*H,1.5,0,Math.PI*2);
+      ctx.fillStyle='white'; ctx.fill(); ctx.restore();
+    });
+    // planet with rings
+    const pX=W*.72, pY=H*.3, pR=28;
+    const pg=ctx.createRadialGradient(pX-pR*.3,pY-pR*.3,2,pX,pY,pR);
+    pg.addColorStop(0,'#C090FF'); pg.addColorStop(0.5,'#8050D0'); pg.addColorStop(1,'#3A1880');
+    ctx.save(); ctx.globalAlpha=.9;
+    ctx.beginPath(); ctx.arc(pX,pY,pR,0,Math.PI*2);
+    ctx.fillStyle=pg; ctx.fill();
+    // ring back
+    ctx.globalAlpha=.35;
+    ctx.strokeStyle='rgba(200,160,255,.7)'; ctx.lineWidth=5;
+    ctx.beginPath(); ctx.ellipse(pX,pY,pR*2.1,pR*.45,-.2,Math.PI,Math.PI*2); ctx.stroke();
+    // ring front
+    ctx.globalAlpha=.55;
+    ctx.beginPath(); ctx.ellipse(pX,pY,pR*2.1,pR*.45,-.2,0,Math.PI); ctx.stroke();
+    ctx.restore();
+    // small moon
+    ctx.beginPath(); ctx.arc(W*.55,H*.42,8,0,Math.PI*2);
+    ctx.fillStyle='rgba(180,150,220,.7)'; ctx.fill();
+    // foreground dark rocks
+    ctx.fillStyle='#05020E';
+    ctx.beginPath(); ctx.moveTo(0,H);
+    ctx.bezierCurveTo(W*.1,H*.82,W*.2,H*.88,W*.35,H*.78);
+    ctx.bezierCurveTo(W*.5,H*.68,W*.65,H*.8,W*.8,H*.72);
+    ctx.bezierCurveTo(W*.9,H*.66,W,H*.75,W,H); ctx.fill();
+  },
+
+  /* ─────────────────────────────────────
+     CHRISTMAS — santa, village, moon, snow
+  ───────────────────────────────────── */
+  xmas(ctx, W, H) {
+    // sky — deep navy to rich teal (matching reference)
+    const sky=ctx.createLinearGradient(0,0,0,H);
+    sky.addColorStop(0,   '#020818');
+    sky.addColorStop(0.25,'#052040');
+    sky.addColorStop(0.55,'#083560');
+    sky.addColorStop(0.8, '#0A5878');
+    sky.addColorStop(1,   '#0C6880');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+
+    // stars
+    for(let i=0;i<45;i++){
+      const x=(i*89+7)%W, y=(i*43+11)%(H*.58)+4;
+      ctx.beginPath(); ctx.arc(x,y,.3+((i*7)%5)*.18,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${.2+((i*11)%8)*.08})`; ctx.fill();
+    }
+
+    // bright star sparkle top
+    [[.28,.08],[.6,.05],[.12,.12]].forEach(([sx,sy],i)=>{
+      const x=sx*W, y=sy*H, s=2+i*.5;
+      ctx.save(); ctx.translate(x,y); ctx.strokeStyle=`rgba(255,255,255,${.6+i*.1})`; ctx.lineWidth=1;
+      for(let a=0;a<4;a++){
+        ctx.save(); ctx.rotate(a*Math.PI/4);
+        ctx.beginPath(); ctx.moveTo(0,-s); ctx.lineTo(0,s); ctx.stroke();
+        ctx.restore();
+      }
+      ctx.restore();
+    });
+
+    // BIG MOON — top right, glowing
+    const mX=W*.82, mY=H*.22, mR=32;
+    const mGlow=ctx.createRadialGradient(mX,mY,0,mX,mY,mR*2.5);
+    mGlow.addColorStop(0,'rgba(220,235,255,.4)');
+    mGlow.addColorStop(1,'transparent');
+    ctx.fillStyle=mGlow; ctx.fillRect(0,0,W,H);
+    ctx.beginPath(); ctx.arc(mX,mY,mR,0,Math.PI*2);
+    const moonG=ctx.createRadialGradient(mX-8,mY-8,2,mX,mY,mR);
+    moonG.addColorStop(0,'#FFFFFF'); moonG.addColorStop(0.5,'#E8F0FF'); moonG.addColorStop(1,'#C0CCEA');
+    ctx.fillStyle=moonG; ctx.fill();
+    // moon craters subtle
+    ctx.fillStyle='rgba(160,180,220,.2)';
+    [[-.25,-.2,5],[.2,.25,4],[-.1,.1,3]].forEach(([dx,dy,r])=>{
+      ctx.beginPath(); ctx.arc(mX+dx*mR,mY+dy*mR,r,0,Math.PI*2); ctx.fill();
+    });
+
+    // SANTA SLEIGH silhouette in front of moon
+    ctx.save();
+    ctx.fillStyle='#0A0A18'; ctx.strokeStyle='#0A0A18';
+    // sleigh
+    const sX=W*.72, sY=H*.1;
+    ctx.translate(sX,sY);
+    ctx.beginPath();
+    ctx.moveTo(-18,8); ctx.bezierCurveTo(-15,2,-8,0,0,2);
+    ctx.bezierCurveTo(8,4,10,8,8,10);
+    ctx.bezierCurveTo(4,14,-4,13,-10,10);
+    ctx.bezierCurveTo(-16,7,-20,12,-18,8);
+    ctx.fill();
+    // santa shape on sleigh
+    ctx.beginPath(); ctx.arc(-5,0,5,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(-5,-6,3.5,0,Math.PI*2); ctx.fill();
+    // reindeer line (5 reindeer)
+    ctx.lineWidth=1.5; ctx.lineCap='round';
+    for(let d=0;d<5;d++){
+      const rx=14+d*14, ry=-4-d*1.5;
+      // body
+      ctx.beginPath(); ctx.ellipse(rx,ry,5,2.5,-.15,0,Math.PI*2); ctx.fill();
+      // head
+      ctx.beginPath(); ctx.arc(rx+5,ry-2,2,0,Math.PI*2); ctx.fill();
+      // antler
+      ctx.beginPath(); ctx.moveTo(rx+5,ry-4);
+      ctx.lineTo(rx+4,ry-7); ctx.lineTo(rx+3,ry-9); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(rx+4,ry-7);
+      ctx.lineTo(rx+6,ry-9); ctx.stroke();
+      // legs
+      ctx.beginPath();
+      ctx.moveTo(rx-2,ry+2); ctx.lineTo(rx-3,ry+6);
+      ctx.moveTo(rx+2,ry+2); ctx.lineTo(rx+3,ry+6);
+      ctx.stroke();
+      // connecting line
+      if(d<4){
+        ctx.beginPath(); ctx.moveTo(rx+5,ry); ctx.lineTo(rx+14,ry-1.5); ctx.stroke();
       }
     }
-    console.log("Table rendered successfully");
-  } catch (error) {
-    console.error("Error in render:", error);
-    document.getElementById("tableBody").innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">Error: ${error.message}</td></tr>`;
-  }
-}
+    ctx.restore();
 
-// ===== EVENT LISTENERS =====
-document.getElementById("themeSelect").addEventListener("change", (e) => {
-  changeTheme(e.target.value);
-});
-
-document.getElementById("darkToggle").addEventListener("click", () => {
-  const currentTheme = localStorage.getItem("shiftTheme") || "default";
-  if (currentTheme === "dark") {
-    changeTheme("default");
-  } else {
-    changeTheme("dark");
-  }
-});
-
-// ===== SHIFT MODAL FUNCTIONS =====
-function openShiftModal() {
-  updateTodayDateLabel();
-  
-  // Set nilai dropdown sesuai BASE_SHIFT
-  document.getElementById("shiftA").value = BASE_SHIFT.A;
-  document.getElementById("shiftB").value = BASE_SHIFT.B;
-  document.getElementById("shiftC").value = BASE_SHIFT.C;
-  document.getElementById("shiftD").value = BASE_SHIFT.D;
-  
-  document.getElementById("shiftModal").style.display = "flex";
-}
-
-function closeShiftModal() {
-  document.getElementById("shiftModal").style.display = "none";
-}
-
-function resetShiftToDefault() {
-  if (confirm("Reset shift ke pengaturan default (berdasarkan 22 Desember 2025)?")) {
-    BASE_SHIFT = calculateDefaultShift();
-    
-    document.getElementById("shiftA").value = BASE_SHIFT.A;
-    document.getElementById("shiftB").value = BASE_SHIFT.B;
-    document.getElementById("shiftC").value = BASE_SHIFT.C;
-    document.getElementById("shiftD").value = BASE_SHIFT.D;
-    
-    localStorage.removeItem("baseShift");
-    scheduleRender();
-    
-    alert("Shift telah direset ke pengaturan default!");
-  }
-}
-
-function saveShift() {
-  BASE_SHIFT.A = parseInt(document.getElementById("shiftA").value);
-  BASE_SHIFT.B = parseInt(document.getElementById("shiftB").value);
-  BASE_SHIFT.C = parseInt(document.getElementById("shiftC").value);
-  BASE_SHIFT.D = parseInt(document.getElementById("shiftD").value);
-  
-  localStorage.setItem("baseShift", JSON.stringify(BASE_SHIFT));
-  closeShiftModal();
-  scheduleRender();
-  
-  alert("Pengaturan shift berhasil disimpan!");
-}
-
-// ===== FULLSCREEN =====
-function toggleFullscreen() {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch(err => {
-      console.log(`Error attempting to enable fullscreen: ${err.message}`);
+    // snowflakes (styled, not just circles)
+    const flakes=[[.08,.15],[.18,.08],[.35,.18],[.52,.1],[.25,.28],[.45,.22],[.15,.35],[.62,.14],[.72,.28]];
+    flakes.forEach(([fx,fy],i)=>{
+      const x=fx*W, y=fy*H, s=3+i%3;
+      ctx.save(); ctx.translate(x,y); ctx.strokeStyle=`rgba(200,230,255,${.5+i%3*.12})`; ctx.lineWidth=.8;
+      for(let a=0;a<3;a++){
+        ctx.save(); ctx.rotate(a*Math.PI/3);
+        ctx.beginPath(); ctx.moveTo(0,-s); ctx.lineTo(0,s); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-s*.4,-s*.5); ctx.lineTo(s*.4,-s*.5); ctx.stroke();
+        ctx.restore();
+      }
+      ctx.restore();
     });
-  } else {
-    document.exitFullscreen();
-  }
-}
 
-document.getElementById("fullscreenToggle").onclick = toggleFullscreen;
+    // BACKGROUND pine trees — dark teal
+    ctx.save(); ctx.filter='blur(1.5px)'; ctx.globalAlpha=.8;
+    function xPineBg(x,h,w){
+      ctx.fillStyle='#0A3A50';
+      ctx.beginPath(); ctx.moveTo(x,H); ctx.lineTo(x,H-h*.2);
+      ctx.lineTo(x-w*.42,H-h*.22); ctx.lineTo(x,H-h*.46);
+      ctx.lineTo(x-w*.3,H-h*.48); ctx.lineTo(x,H-h*.7);
+      ctx.lineTo(x-w*.18,H-h*.72); ctx.lineTo(x,H-h);
+      ctx.lineTo(x+w*.18,H-h*.72); ctx.lineTo(x+w*.3,H-h*.7);
+      ctx.lineTo(x,H-h*.48); ctx.lineTo(x+w*.42,H-h*.46);
+      ctx.lineTo(x,H-h*.22); ctx.lineTo(x+w*.42,H-h*.22);
+      ctx.lineTo(x,H); ctx.fill();
+    }
+    xPineBg(W*.02, H*.65,18); xPineBg(W*.1,H*.55,15);
+    xPineBg(W*.82, H*.62,17); xPineBg(W*.92,H*.52,14); xPineBg(W*.98,H*.6,16);
+    ctx.restore();
 
-// ===== EXPORT PDF =====
-function exportToPDF() {
-  const monthName = new Date(currentYear, currentMonth).toLocaleDateString('id-ID', {
-    month: 'long',
-    year: 'numeric'
-  });
-  
-  const currentDate = new Date().toLocaleDateString('id-ID', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-  
-  let tableHTML = '';
-  const days = new Date(currentYear, currentMonth + 1, 0).getDate();
-  const todayKey = dateKey(new Date());
-  
-  for (let d = 1; d <= days; d++) {
-    const date = new Date(currentYear, currentMonth, d);
-    const key = dateKey(date);
-    
-    const dayName = date.toLocaleDateString('id-ID', { weekday: 'short' }).replace('.', '');
-    const dayNum = String(d).padStart(2, '0');
-    const dateStr = `${dayName}, ${dayNum}`;
-    
-    const isSunday = date.getDay() === 0;
-    const isToday = key === todayKey;
-    const holidayNote = HOLIDAYS[key] ? `<span class="holiday-note">${HOLIDAYS[key]}</span>` : '';
-    
-    let rowClass = isToday ? 'today' : '';
-    
-    tableHTML += `<tr${rowClass ? ' class="' + rowClass + '"' : ''}>`;
-    tableHTML += `<td class="date-cell${isSunday ? ' sunday' : ''}">${dateStr}${holidayNote}</td>`;
-    
-    ['A', 'B', 'C', 'D'].forEach(grup => {
-      const shift = getShiftForDate(grup, date);
-      const shiftType = shift.split(' ')[0].toLowerCase();
-      
-      tableHTML += `<td class="cell-${shiftType}">${shift}</td>`;
+    // VILLAGE — red houses with snow roofs
+    function house(x,y,w,h){
+      // body
+      ctx.fillStyle='#8B1A1A';
+      ctx.fillRect(x-w/2, y, w, h);
+      // roof
+      ctx.fillStyle='#6A1010';
+      ctx.beginPath(); ctx.moveTo(x-w/2-3,y); ctx.lineTo(x,y-h*.55); ctx.lineTo(x+w/2+3,y); ctx.fill();
+      // snow on roof
+      ctx.fillStyle='rgba(220,238,255,.95)';
+      ctx.beginPath(); ctx.moveTo(x-w/2,y);
+      ctx.quadraticCurveTo(x,y-h*.55+4, x+w/2,y);
+      ctx.fill();
+      // chimney
+      ctx.fillStyle='#6A1010';
+      ctx.fillRect(x+w*.15,y-h*.5,w*.1,h*.3);
+      ctx.fillStyle='rgba(220,238,255,.9)';
+      ctx.fillRect(x+w*.12,y-h*.52,w*.16,h*.06);
+      // windows
+      ctx.fillStyle='rgba(255,220,120,.7)';
+      ctx.beginPath(); ctx.arc(x-w*.18,y+h*.35,w*.09,Math.PI,0); ctx.fillRect(x-w*.27,y+h*.35,w*.18,h*.28); ctx.fill();
+      ctx.beginPath(); ctx.arc(x+w*.18,y+h*.35,w*.09,Math.PI,0); ctx.fillRect(x+w*.09,y+h*.35,w*.18,h*.28); ctx.fill();
+    }
+    house(W*.28, H*.6,  38, 38);
+    house(W*.42, H*.58, 32, 34);
+    house(W*.54, H*.62, 28, 30);
+    house(W*.65, H*.6,  34, 36);
+    house(W*.38, H*.68, 24, 26);
+    house(W*.58, H*.7,  22, 24);
+
+    // FOREGROUND snow pine trees — white, prominent
+    function xPineFront(x,h,w){
+      ctx.fillStyle='rgba(40,90,120,.9)';
+      ctx.beginPath(); ctx.moveTo(x,H); ctx.lineTo(x,H-h*.18);
+      ctx.lineTo(x-w*.46,H-h*.2); ctx.lineTo(x,H-h*.42);
+      ctx.lineTo(x-w*.36,H-h*.44); ctx.lineTo(x,H-h*.65);
+      ctx.lineTo(x-w*.24,H-h*.67); ctx.lineTo(x,H-h);
+      ctx.lineTo(x+w*.24,H-h*.67); ctx.lineTo(x+w*.36,H-h*.65);
+      ctx.lineTo(x,H-h*.44); ctx.lineTo(x+w*.46,H-h*.42);
+      ctx.lineTo(x,H-h*.2); ctx.lineTo(x+w*.46,H-h*.2);
+      ctx.lineTo(x,H); ctx.fill();
+      // snow layers — thick, like the reference
+      ctx.fillStyle='rgba(225,240,255,.98)';
+      [[1,.14,.46],[.72,.35,.38],[.45,.57,.28],[.22,.74,.18]].forEach(([tw,ty,cov])=>{
+        ctx.beginPath(); ctx.moveTo(x,H-h*ty);
+        ctx.bezierCurveTo(x-w*cov*1.2, H-h*(ty+.05), x-w*cov*.8, H-h*(ty+.15), x-w*cov*.4, H-h*(ty+.16));
+        ctx.bezierCurveTo(x, H-h*(ty+.1), x+w*cov*.8, H-h*(ty+.15), x+w*cov*1.2, H-h*(ty+.05));
+        ctx.lineTo(x, H-h*ty); ctx.fill();
+      });
+    }
+    xPineFront(-W*.04, H*.9, 36);
+    xPineFront(W*.18,  H*.78, 28);
+    xPineFront(W*.82,  H*.8,  30);
+    xPineFront(W*1.02, H*.88, 34);
+
+    // snow ground — white rounded
+    const sg=ctx.createLinearGradient(0,H*.72,0,H);
+    sg.addColorStop(0,'rgba(200,225,248,.0)');
+    sg.addColorStop(0.3,'rgba(215,235,255,.88)');
+    sg.addColorStop(1,'rgba(240,250,255,1)');
+    ctx.fillStyle=sg;
+    ctx.beginPath(); ctx.moveTo(0,H);
+    ctx.bezierCurveTo(W*.15,H*.78, W*.35,H*.82, W*.55,H*.76);
+    ctx.bezierCurveTo(W*.75,H*.7,  W*.9,H*.78,  W,H*.74);
+    ctx.lineTo(W,H); ctx.fill();
+    // snow mounds
+    ctx.fillStyle='rgba(228,242,255,.9)';
+    ctx.beginPath(); ctx.ellipse(W*.15,H*.9,W*.14,H*.06,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(W*.78,H*.88,W*.16,H*.05,0,0,Math.PI*2); ctx.fill();
+
+    // falling snow particles
+    for(let i=0;i<20;i++){
+      const x=(i*79+23)%W, y=(i*41+13)%(H*.85)+5;
+      ctx.beginPath(); ctx.arc(x,y,.7+((i*9)%4)*.3,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${.4+((i*7)%4)*.1})`; ctx.fill();
+    }
+  },
+
+  /* ─────────────────────────────────────
+     DARK — city at night, full moon
+  ───────────────────────────────────── */
+  dark(ctx, W, H) {
+    const sky=ctx.createLinearGradient(0,0,0,H);
+    sky.addColorStop(0,'#03030A'); sky.addColorStop(0.5,'#07071A');
+    sky.addColorStop(1,'#0E0E28');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+    // moon glow
+    const mg=ctx.createRadialGradient(W*.75,H*.2,0,W*.75,H*.2,50);
+    mg.addColorStop(0,'rgba(255,255,220,.55)'); mg.addColorStop(1,'transparent');
+    ctx.fillStyle=mg; ctx.fillRect(0,0,W,H);
+    ctx.beginPath(); ctx.arc(W*.75,H*.2,18,0,Math.PI*2);
+    ctx.fillStyle='#FFFFF0'; ctx.fill();
+    // moon surface detail
+    ctx.fillStyle='rgba(200,200,180,.2)';
+    [[-.2,-.1,4],[.15,.2,3],[-.05,.05,2]].forEach(([dx,dy,r])=>{
+      ctx.beginPath(); ctx.arc(W*.75+dx*18,H*.2+dy*18,r,0,Math.PI*2); ctx.fill();
     });
-    
-    tableHTML += '</tr>';
-  }
-  
-  const printHTML = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Jadwal Shift - ${monthName}</title>
-  <style>
-    @page { size: A4 portrait; margin: 8mm 10mm; }
-    body { font-family: Arial; margin: 0; padding: 0; font-size: 10px; }
-    .header { text-align: center; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #333; }
-    .main-title { font-size: 16px; font-weight: bold; margin-bottom: 3px; }
-    .month-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
-    .print-date { font-size: 9px; color: #666; }
-    table { width: 100%; border-collapse: collapse; font-size: 9px; }
-    th { background-color: #f2f2f2; padding: 5px 3px; border: 1px solid #777; text-align: center; }
-    td { padding: 4px 3px; border: 1px solid #aaa; text-align: center; }
-    .date-cell { width: 65px; text-align: left; padding-left: 6px; font-weight: 600; }
-    .cell-pagi { background-color: #fff3cd !important; color: #856404; }
-    .cell-sore { background-color: #d1ecf1 !important; color: #0c5460; }
-    .cell-malam { background-color: #f8f9fa !important; color: #212529; }
-    .cell-libur { background-color: #f8d7da !important; color: #721c24; }
-    .sunday { color: #dc3545 !important; }
-    .holiday-note { display: block; font-size: 7px; color: #dc3545; font-style: italic; }
-    .today td { background-color: rgba(59, 130, 246, 0.1) !important; }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <div class="main-title">JADWAL KERJA SHIFT</div>
-    <div class="month-title">${monthName}</div>
-    <div class="print-date">Dicetak: ${currentDate}</div>
-  </div>
-  
-  <table>
-    <thead>
-      <tr>
-        <th style="width: 65px;">Tanggal</th>
-        <th>A</th>
-        <th>B</th>
-        <th>C</th>
-        <th>D</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${tableHTML}
-    </tbody>
-  </table>
-  
-  <div class="footer" style="text-align:center;margin-top:15px;font-size:8px;color:#666;">
-    Jadwal Shift © ${new Date().getFullYear()} - Generated by Malfoy ☆
-  </div>
-  
-  <script>
-    window.onload = function() {
-      setTimeout(function() {
-        window.print();
-        setTimeout(function() {
-          if (!/Android|iPhone|iPad/.test(navigator.userAgent)) {
-            window.close();
+    // stars
+    for(let i=0;i<45;i++){
+      const x=(i*89+17)%W, y=(i*41+11)%(H*.65)+5;
+      const r=.3+((i*11)%8)*.16;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${.25+i%6*.1})`; ctx.fill();
+    }
+    // city buildings
+    ctx.fillStyle='#06061A';
+    const buildings=[
+      [0,.55,.06,.45],[.04,.42,.05,.58],[.08,.6,.04,.4],[.12,.38,.06,.62],
+      [.17,.5,.05,.5],[.21,.44,.07,.56],[.27,.62,.04,.38],[.3,.48,.05,.52],
+      [.64,.52,.05,.48],[.68,.4,.06,.6],[.73,.58,.05,.42],[.77,.45,.07,.55],
+      [.83,.62,.04,.38],[.86,.5,.05,.5],[.9,.44,.06,.56],[.95,.6,.05,.4]
+    ];
+    buildings.forEach(([x,y,w,h])=>{
+      ctx.fillRect(x*W,y*H,w*W,h*H);
+    });
+    // windows
+    buildings.forEach(([bx,by,bw,bh])=>{
+      for(let wy=by+.03;wy<by+bh-.05;wy+=.07){
+        for(let wx=bx+.005;wx<bx+bw-.005;wx+=.018){
+          if(Math.random()>.45){
+            ctx.fillStyle=`rgba(255,240,150,${.2+Math.random()*.35})`;
+            ctx.fillRect(wx*W,wy*H,bw*W*.25,bh*H*.08);
           }
-        }, 500);
-      }, 300);
-    };
-  <\/script>
-</body>
-</html>`;
-  
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) {
-    alert('Popup diblokir! Izinkan popup untuk mencetak PDF.');
-    return;
+        }
+      }
+    });
+    // ground reflection
+    const refl=ctx.createLinearGradient(0,H*.88,0,H);
+    refl.addColorStop(0,'rgba(100,100,180,.08)'); refl.addColorStop(1,'rgba(20,20,60,.4)');
+    ctx.fillStyle=refl; ctx.fillRect(0,H*.88,W,H*.12);
+  },
+
+};
+
+/* ── THEME CONFIG ── */
+const THEME_CFG = {
+  default:    { deco:'🌸', accent:'#6C63FF', emoji:'🎨' },
+  snow:       { deco:'❄️', accent:'#2980D0', emoji:'❄️' },
+  halloween:  { deco:'🎃', accent:'#F07020', emoji:'🎃' },
+  forest:     { deco:'🌳', accent:'#2E7D32', emoji:'🌿' },
+  islamic:    { deco:'🌙', accent:'#C8580A', emoji:'🌙' },
+  space:      { deco:'🔮', accent:'#9B6DFA', emoji:'🚀' },
+  xmas:       { deco:'🎄', accent:'#C62828', emoji:'🎄' },
+  dark:       { deco:'⭐', accent:'#7C6DFA', emoji:'🌑' },
+};
+
+/* ── HOLIDAYS ── */
+const HOLI_DB = {
+  "2025-01-01":"Tahun Baru 2025","2025-01-27":"Isra Mi'raj","2025-01-28":"Cuti Bersama Isra Mi'raj",
+  "2025-01-29":"Tahun Baru Imlek","2025-03-28":"Cuti Bersama Nyepi","2025-03-29":"Hari Suci Nyepi",
+  "2025-03-31":"Idul Fitri 1446 H","2025-04-01":"Idul Fitri 1446 H","2025-04-02":"Cuti Bersama Idul Fitri",
+  "2025-04-03":"Cuti Bersama Idul Fitri","2025-04-04":"Cuti Bersama Idul Fitri",
+  "2025-04-07":"Cuti Bersama Idul Fitri","2025-04-18":"Wafat Isa Al Masih","2025-04-20":"Paskah",
+  "2025-05-01":"Hari Buruh","2025-05-12":"Hari Raya Waisak","2025-05-13":"Cuti Bersama Waisak",
+  "2025-05-29":"Kenaikan Isa Al Masih","2025-05-30":"Cuti Bersama Kenaikan Isa",
+  "2025-06-01":"Hari Lahir Pancasila","2025-06-06":"Idul Adha 1446 H",
+  "2025-06-27":"Tahun Baru Islam 1447 H","2025-08-17":"HUT RI ke-80",
+  "2025-09-05":"Maulid Nabi Muhammad SAW","2025-12-25":"Hari Raya Natal","2025-12-26":"Cuti Bersama Natal",
+  "2026-01-01":"Tahun Baru 2026","2026-01-02":"Cuti Bersama Tahun Baru",
+  "2026-01-17":"Isra Mi'raj 1447 H","2026-01-28":"Tahun Baru Imlek 2577",
+  "2026-03-18":"Cuti Bersama Nyepi","2026-03-19":"Hari Suci Nyepi","2026-03-20":"Wafat Isa Al Masih",
+  "2026-03-21":"Idul Fitri 1447 H","2026-03-22":"Idul Fitri 1447 H",
+  "2026-03-23":"Cuti Bersama Idul Fitri","2026-03-24":"Cuti Bersama Idul Fitri",
+  "2026-03-25":"Cuti Bersama Idul Fitri","2026-03-26":"Cuti Bersama Idul Fitri",
+  "2026-04-05":"Paskah","2026-05-01":"Hari Buruh","2026-05-14":"Kenaikan Isa Al Masih",
+  "2026-05-15":"Cuti Bersama Kenaikan Isa","2026-05-25":"Hari Raya Waisak",
+  "2026-05-26":"Cuti Bersama Waisak","2026-05-27":"Idul Adha 1447 H",
+  "2026-06-01":"Hari Lahir Pancasila","2026-06-17":"Tahun Baru Islam 1448 H",
+  "2026-08-17":"HUT RI ke-81","2026-08-25":"Maulid Nabi Muhammad SAW",
+  "2026-12-24":"Cuti Bersama Natal","2026-12-25":"Hari Raya Natal","2026-12-26":"Cuti Bersama Natal"
+};
+
+/* ── CORE ── */
+const START   = new Date(2025,11,22);
+const CYCLE   = ["Pagi","Pagi","Sore","Sore","Malam","Malam","Libur","Libur"];
+const OFFSETS = {A:6,B:4,C:2,D:0};
+let CY,CM,HOLI={},scrolled=false,selKey=null,rt=null;
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+function calcDef(){
+  const t=new Date();t.setHours(0,0,0,0);
+  const s=new Date(START);s.setHours(0,0,0,0);
+  const d=Math.floor((t-s)/86400000),r={};
+  ['A','B','C','D'].forEach(g=>{let i=(OFFSETS[g]+d)%8;if(i<0)i+=8;r[g]=i;});
+  return r;
+}
+let BS = JSON.parse(localStorage.getItem('bs'))||calcDef();
+
+function getShift(g,date){
+  try{
+    const tgt=new Date(date);tgt.setHours(0,0,0,0);
+    let idx;
+    if(localStorage.getItem('bs')!==null){
+      const now=new Date();now.setHours(0,0,0,0);
+      idx=(BS[g]+Math.floor((tgt-now)/86400000))%8;
+    }else{
+      const s=new Date(START);s.setHours(0,0,0,0);
+      idx=(OFFSETS[g]+Math.floor((tgt-s)/86400000))%8;
+    }
+    if(idx<0)idx+=8;
+    const tp=CYCLE[idx],fi=CYCLE.indexOf(tp);
+    return idx===fi+1?`${tp} 2`:`${tp} 1`;
+  }catch{return'—';}
+}
+function dk(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+
+/* ── RENDER ── */
+function sched(){clearTimeout(rt);rt=setTimeout(render,50);}
+function render(){
+  const tb=document.getElementById('tbody');tb.innerHTML='';
+  const todK=dk(new Date()),days=new Date(CY,CM+1,0).getDate();
+  for(let d=1;d<=days;d++){
+    const date=new Date(CY,CM,d),key=dk(date);
+    const isSun=date.getDay()===0,isTod=key===todK,isSel=key===selKey,isH=!!HOLI[key];
+    const tr=document.createElement('tr');
+    tr.className=['ri',isTod?'is-today':'',isSel?'is-sel':'',isH?'is-holi':''].filter(Boolean).join(' ');
+    tr.style.animationDelay=`${(d-1)*.007}s`;
+    tr.onclick=()=>{selKey=selKey===key?null:key;sched();};
+    const dc=document.createElement('td');
+    dc.className='dc'+(isSun?' dc-sun':'');
+    const dn=date.toLocaleDateString('id-ID',{weekday:'short'});
+    dc.innerHTML=
+      `<div class="dc-row"><span class="dc-num">${String(d).padStart(2,'0')}</span><span class="dc-day">${dn}</span></div>`+
+      (isTod?'<span class="lbl-today">Hari Ini</span>':'')+
+      (isH?`<span class="holi-nm">🎉 ${HOLI[key]}</span>`:'');
+    tr.appendChild(dc);
+    ['A','B','C','D'].forEach(g=>{
+      const td=document.createElement('td');td.className='sc';
+      const s=getShift(g,date),tp=s.split(' ')[0].toLowerCase();
+      td.innerHTML=`<span class="badge ${tp}">${s}</span>`;
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+    if(!scrolled&&isTod){setTimeout(()=>tr.scrollIntoView({behavior:'smooth',block:'center'}),400);scrolled=true;}
   }
-  
-  printWindow.document.open();
-  printWindow.document.write(printHTML);
-  printWindow.document.close();
 }
 
-// ===== MONTH CONTROLS =====
-function setMonth(year, month) {
-  currentYear = year;
-  currentMonth = month;
-  document.getElementById("monthPicker").value = `${year}-${String(month + 1).padStart(2, "0")}`;
-  scrolled = false;
+/* ── MONTH ── */
+function updHead(){
+  const nm=new Date(CY,CM).toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+  const ns=new Date(CY,CM).toLocaleDateString('id-ID',{month:'short',year:'numeric'});
+  document.getElementById('appMonth').textContent='PT. Motasa Indonesia';
+  document.getElementById('monthLabel').textContent=ns;
+  document.getElementById('monthPick').value=`${CY}-${String(CM+1).padStart(2,'0')}`;
+}
+function loadHoli(year){
+  HOLI={};
+  Object.keys(HOLI_DB).forEach(k=>{if(k.startsWith(String(year)))HOLI[k]=HOLI_DB[k];});
+  updHead();
+  try{
+    const ctrl=new AbortController();setTimeout(()=>ctrl.abort(),5000);
+    fetch('https://api-harilibur.vercel.app/api?year='+year,{signal:ctrl.signal})
+      .then(r=>r.ok?r.json():null).then(data=>{
+        if(!data)return;
+        const f={};data.forEach(i=>(i.is_national_holiday||i.is_cuti_bersama)&&(f[i.holiday_date]=i.holiday_name));
+        if(Object.keys(f).length>0){HOLI=f;sched();}
+      }).catch(()=>{});
+  }catch{}
+}
+function setMonth(y,m){CY=y;CM=m;scrolled=false;loadHoli(y);sched();}
+document.getElementById('prevBtn').onclick=()=>{let y=CY,m=CM-1;if(m<0){m=11;y--;}setMonth(y,m);};
+document.getElementById('nextBtn').onclick=()=>{let y=CY,m=CM+1;if(m>11){m=0;y++;}setMonth(y,m);};
+document.getElementById('monthPick').onchange=e=>{const[y,m]=e.target.value.split('-');setMonth(+y,+m-1);};
+
+/* ── THEME ── */
+const TC=['th-snow','th-halloween','th-forest','th-islamic','th-space','th-xmas','th-dark'];
+function applyTheme(n){
+  document.body.classList.remove(...TC);
+  if(n!=='default')document.body.classList.add('th-'+n);
+  localStorage.setItem('theme',n);
+  const cfg=THEME_CFG[n]||THEME_CFG.default;
+  document.querySelectorAll('.tg').forEach(b=>b.classList.toggle('on',b.dataset.t===n));
   
-  loadHolidays(year).then(() => {
-    scheduleRender();
-  });
+  document.getElementById('activeEmoji').textContent=cfg.emoji;
+  document.getElementById('pdfBtn').style.background=cfg.accent;
+  document.getElementById('pdfBtn').style.boxShadow=
+    `4px 4px 12px rgba(0,0,0,.18),-2px -2px 8px rgba(255,255,255,.15),0 4px 20px ${cfg.accent}66`;
+  renderIllus(n);
+  // re-trigger fade-in on text
+  const hc = document.querySelector('.hdr-center');
+  if(hc){ hc.style.animation='none'; hc.offsetHeight; hc.style.animation=''; }
+}
+document.querySelectorAll('.tg').forEach(b=>b.addEventListener('click',()=>{
+  applyTheme(b.dataset.t); closeTheme();
+}));
+
+/* ── SHEETS ── */
+function openTheme(){document.getElementById('themeOv').style.display='flex';}
+function closeTheme(){document.getElementById('themeOv').style.display='none';}
+function openShift(){
+  document.getElementById('todayLbl').textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  ['A','B','C','D'].forEach(g=>document.getElementById('s'+g).value=BS[g]);
+  document.getElementById('shiftOv').style.display='flex';
+}
+function closeShift(){document.getElementById('shiftOv').style.display='none';}
+function saveShift(){
+  ['A','B','C','D'].forEach(g=>BS[g]=parseInt(document.getElementById('s'+g).value));
+  localStorage.setItem('bs',JSON.stringify(BS));closeShift();sched();
+}
+function resetShift(){
+  if(!confirm('Reset ke default?'))return;
+  BS=calcDef();localStorage.removeItem('bs');
+  ['A','B','C','D'].forEach(g=>document.getElementById('s'+g).value=BS[g]);sched();
 }
 
-document.getElementById("prev").onclick = () => {
-  let y = currentYear, m = currentMonth - 1;
-  if (m < 0) { m = 11; y--; }
-  setMonth(y, m);
-};
-
-document.getElementById("next").onclick = () => {
-  let y = currentYear, m = currentMonth + 1;
-  if (m > 11) { m = 0; y++; }
-  setMonth(y, m);
-};
-
-document.getElementById("monthPicker").onchange = e => {
-  const [y, m] = e.target.value.split("-");
-  setMonth(+y, +m - 1);
-};
-
-// ===== START APPLICATION =====
-const now = new Date();
-setMonth(now.getFullYear(), now.getMonth());
-initTheme();
-
-document.getElementById("shiftModal").addEventListener("click", function (e) {
-  if (e.target === this) closeShiftModal();
+/* ── KEYBOARD ── */
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft')document.getElementById('prevBtn').click();
+  if(e.key==='ArrowRight')document.getElementById('nextBtn').click();
+  if(e.key==='Escape'){closeTheme();closeShift();}
 });
 
-// Debug info
-console.log("===== DEBUG INFO =====");
-console.log("START_DATE:", START_DATE.toLocaleDateString());
-console.log("BASE_SHIFT:", BASE_SHIFT);
+/* ── PDF ── */
+function doPDF(){
+  const mn=new Date(CY,CM).toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+  const pr=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const days=new Date(CY,CM+1,0).getDate(),todK=dk(new Date());
+  let rows='';
+  for(let d=1;d<=days;d++){
+    const date=new Date(CY,CM,d),key=dk(date);
+    const dn=date.toLocaleDateString('id-ID',{weekday:'short'});
+    const isSun=date.getDay()===0,isTod=key===todK,isH=!!HOLI[key];
+    rows+=`<tr${isTod?' class="tod"':isH?' class="hol"':''}><td class="dc${isSun?' sun':''}">${dn}, ${String(d).padStart(2,'0')}${isH?`<span class="hn">${HOLI[key]}</span>`:''}</td>`;
+    ['A','B','C','D'].forEach(g=>{const s=getShift(g,date),t=s.split(' ')[0].toLowerCase();rows+=`<td class="c-${t}">${s}</td>`;});
+    rows+='</tr>';
+  }
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Jadwal Shift – ${mn}</title><style>@page{size:A4;margin:10mm 12mm}body{font-family:Arial;font-size:10px;margin:0}.hdr{text-align:center;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #333}.hdr h1{font-size:14px;margin:0 0 2px}.hdr h2{font-size:11px;margin:0;font-weight:600}.hdr p{font-size:8px;color:#666;margin:2px 0 0}table{width:100%;border-collapse:collapse}th{background:#f4f4f4;padding:5px 4px;border:1px solid #ccc;text-align:center;font-size:9px;font-weight:700}td{padding:4px 3px;border:1px solid #ddd;text-align:center;font-size:9px}.dc{text-align:left;padding-left:5px;font-weight:700;width:70px}.sun{color:#c00}.hn{display:block;font-size:7px;color:#c00;font-style:italic}.c-pagi{background:#fffde7;color:#7a5c00}.c-sore{background:#e1f5fe;color:#004a80}.c-malam{background:#ede7f6;color:#3a0080}.c-libur{background:#fce4ec;color:#880e4f}.tod td{background:rgba(108,99,255,.05)!important}.hol td{background:rgba(239,68,68,.04)!important}.ftr{text-align:center;margin-top:12px;font-size:8px;color:#888}</style></head><body><div class="hdr"><h1>JADWAL KERJA SHIFT 4 GRUP</h1><h2>${mn}</h2><p>Dicetak: ${pr}</p></div><table><thead><tr><th>Tanggal</th><th>Grup A</th><th>Grup B</th><th>Grup C</th><th>Grup D</th></tr></thead><tbody>${rows}</tbody></table><div class="ftr">Generated by Malfoy ☆ — © ${new Date().getFullYear()}</div><script>window.onload=()=>{setTimeout(()=>{window.print();setTimeout(()=>{if(!/Android|iPhone|iPad/.test(navigator.userAgent))window.close();},500);},300);};<\/script></body></html>`;
+  const w=window.open('','_blank');
+  if(!w){alert('Izinkan popup!');return;}
+  w.document.open();w.document.write(html);w.document.close();
+}
 
-const testDate = new Date(2026, 0, 8); // 8 Januari 2026
-console.log("Tanggal 8 Januari 2026:");
-["A", "B", "C", "D"].forEach(grup => {
-  const shift = getShiftForDate(grup, testDate);
-  console.log(`Grup ${grup}: ${shift}`);
-});
+/* ── INIT ── */
+applyTheme(localStorage.getItem('theme')||'default');
+const now=new Date();
+setMonth(now.getFullYear(),now.getMonth());
 </script>
 </body>
 </html>
