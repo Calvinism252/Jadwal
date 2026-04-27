@@ -801,7 +801,7 @@ body.th-dark .shift-bar { border-bottom-color: rgba(255,255,255,.04); }
 </div>
 
 <!-- ══ PDF BTN ══ -->
-<button class="pdf-btn" id="pdfBtn" onclick="openPDF()">🖨️ Cetak / PDF</button>
+<button class="pdf-btn" id="pdfBtn" onclick="doPDFYear()">🖨️ Cetak / PDF</button>
 
 <div class="footer">Made with ❤️ by <b>Malfoy</b> · <span id="yr"></span></div>
 
@@ -845,33 +845,6 @@ body.th-dark .shift-bar { border-bottom-color: rgba(255,255,255,.04); }
       <button class="sh-btn" onclick="closeShift()">Batal</button>
       <button class="sh-btn primary" onclick="saveShift()">Simpan</button>
     </div>
-  </div>
-</div>
-
-<!-- ══ PDF SHEET ══ -->
-<div class="sheet-ov" id="pdfOv" onclick="if(event.target===this)closePDF()">
-  <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title">Cetak / PDF</div>
-    <div class="sheet-sub" id="pdfSubLbl">Pilih format cetak</div>
-    <div class="sheet-divider"></div>
-    <div class="pdf-opts">
-      <button class="pdf-opt-btn" onclick="doPDFMonth();closePDF()">
-        <div class="pdf-opt-icon">📄</div>
-        <div>
-          <div class="pdf-opt-title" id="pdfMonthLabel">Cetak Bulan Ini</div>
-          <div class="pdf-opt-sub">Format vertikal per tanggal · A4 portrait</div>
-        </div>
-      </button>
-      <button class="pdf-opt-btn" onclick="doPDFYear();closePDF()">
-        <div class="pdf-opt-icon">📋</div>
-        <div>
-          <div class="pdf-opt-title" id="pdfYearLabel">Cetak 1 Tahun</div>
-          <div class="pdf-opt-sub">Format horizontal seperti Excel · A4 landscape</div>
-        </div>
-      </button>
-    </div>
-    <div style="height:16px"></div>
   </div>
 </div>
 
@@ -2061,38 +2034,41 @@ function doPDFYear(){
   const BULAN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
   const holiYear={...fixedHoli(CY)};
   Object.keys(HOLI_DB).forEach(k=>{if(k.startsWith(String(CY)))holiYear[k]=HOLI_DB[k];});
+  // Gabung juga dengan HOLI yang sudah di-load dari API (kalau ada)
+  Object.keys(HOLI).forEach(k=>{if(k.startsWith(String(CY)))holiYear[k]=HOLI[k];});
   const todK=dk(new Date());
   let blocks='';
   for(let m=0;m<12;m++){
     const days=new Date(CY,m+1,0).getDate();
+    const holiThisMonth=[];
+    for(let d=1;d<=days;d++){
+      const key=`${CY}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      if(holiYear[key]) holiThisMonth.push({tgl:d,nama:holiYear[key]});
+    }
+
     let dateRow='<tr><td class="glbl"></td>';
     for(let d=1;d<=31;d++){
       if(d<=days){
         const date=new Date(CY,m,d);
         const isSun=date.getDay()===0;
         const key=dk(date);
-        const isTod=key===todK;
         const isH=!!holiYear[key];
-        let cls='dnum';
-        if(isTod)cls+=' tod';
-        else if(isSun||isH)cls+=' sun';
+        const cls='dnum'+(isSun||isH?' sun':'');
         dateRow+=`<td class="${cls}">${d}</td>`;
       }else{
         dateRow+='<td class="empty"></td>';
       }
     }
     dateRow+='</tr>';
+
     let grupRows='';
     ['A','B','C','D'].forEach(g=>{
       let row=`<tr><td class="glbl">Grup ${g}</td>`;
       for(let d=1;d<=31;d++){
         if(d<=days){
           const date=new Date(CY,m,d);
-          const key=dk(date);
-          const isTod=key===todK;
           const {code,cls}=shiftCode(g,date);
-          let tdCls='sc '+cls+(isTod?' tod':'');
-          row+=`<td class="${tdCls}">${code}</td>`;
+          row+=`<td class="sc ${cls}">${code}</td>`;
         }else{
           row+='<td class="empty"></td>';
         }
@@ -2100,10 +2076,59 @@ function doPDFYear(){
       row+='</tr>';
       grupRows+=row;
     });
-    blocks+=`<div class="month-block"><div class="month-title">${BULAN[m]} ${CY}</div><table><thead>${dateRow}</thead><tbody>${grupRows}</tbody></table></div>`;
+
+    let holiNotes='';
+    if(holiThisMonth.length>0){
+      const notes=holiThisMonth.map(h=>`<span class="holi-note">📅 ${String(h.tgl).padStart(2,'0')} — ${h.nama}</span>`).join('');
+      holiNotes=`<div class="holi-notes">${notes}</div>`;
+    }
+
+    blocks+=`<div class="month-block"><div class="month-title">${BULAN[m]} ${CY}</div><table><thead>${dateRow}</thead><tbody>${grupRows}</tbody></table>${holiNotes}</div>`;
   }
-  const css=`@page{size:A4;margin:8mm 10mm}*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}body{font-family:Arial,sans-serif;font-size:7px;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}.main-title{text-align:center;font-size:11px;font-weight:700;margin-bottom:6px;padding-bottom:4px;border-bottom:2px solid #333}.sub-title{text-align:center;font-size:6.5px;color:#666;margin-top:1px}.month-block{margin-bottom:7px;page-break-inside:avoid}.month-title{font-size:8.5px;font-style:italic;font-weight:700;margin-bottom:2px;color:#333;padding-left:1px}table{width:100%;border-collapse:collapse;table-layout:fixed}td{border:1px solid #bbb;text-align:center;padding:2.5px 0;font-size:6px;font-weight:700;white-space:nowrap;overflow:hidden;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}.glbl{background:#e8e8e8!important;color:#222;font-size:6px;text-align:left;padding-left:2px;border-right:1.5px solid #888;width:24px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.dnum{background:#f0f0f0!important;color:#333;-webkit-print-color-adjust:exact;print-color-adjust:exact}.dnum.sun{color:#fff!important;background:#1565C0!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.dnum.tod{color:#fff!important;background:#0D47A1!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.empty{background:#fafafa!important;border-color:#ddd;-webkit-print-color-adjust:exact;print-color-adjust:exact}.sc{font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}.pagi{background:#FFF9C4!important;color:#5D4037!important}.sore{background:#BBDEFB!important;color:#0D47A1!important}.malam{background:#D1C4E9!important;color:#311b92!important}.libur{background:#C62828!important;color:#fff!important;font-size:5.5px}.sc.tod{background:#0D47A1!important;color:#fff!important}.ftr{text-align:center;font-size:6px;color:#999;margin-top:5px;border-top:1px solid #eee;padding-top:3px}.legend{display:flex;gap:8px;justify-content:center;margin:3px 0 6px;font-size:6.5px;flex-wrap:wrap}.leg-item{display:flex;align-items:center;gap:3px}.leg-box{width:10px;height:10px;border:1px solid #999;-webkit-print-color-adjust:exact;print-color-adjust:exact}`;
-  const html=`<!DOCTYPE html><html style="-webkit-print-color-adjust:exact;print-color-adjust:exact"><head><meta charset="UTF-8"><title>Schedule Kerja ${CY}</title><style>${css}</style></head><body><div class="main-title">Schedule Kerja Operator Produksi 4 Grup ${CY}<div class="sub-title">PT. Motasa Indonesia &nbsp;·&nbsp; Dicetak: ${pr}</div></div><div class="legend"><div class="leg-item"><div class="leg-box" style="background:#FFF9C4!important;-webkit-print-color-adjust:exact;print-color-adjust:exact"></div>&nbsp;1=Pagi</div><div class="leg-item"><div class="leg-box" style="background:#BBDEFB!important;-webkit-print-color-adjust:exact;print-color-adjust:exact"></div>&nbsp;2=Sore</div><div class="leg-item"><div class="leg-box" style="background:#D1C4E9!important;-webkit-print-color-adjust:exact;print-color-adjust:exact"></div>&nbsp;3=Malam</div><div class="leg-item"><div class="leg-box" style="background:#C62828!important;-webkit-print-color-adjust:exact;print-color-adjust:exact"></div>&nbsp;off=Libur</div><div class="leg-item"><div class="leg-box" style="background:#1565C0!important;-webkit-print-color-adjust:exact;print-color-adjust:exact"></div>&nbsp;Minggu/Hari Ini</div></div>${blocks}<div class="ftr">Generated by Malfoy ☆ — © ${CY}</div><script>window.onload=()=>{setTimeout(()=>{window.print();setTimeout(()=>{if(!/Android|iPhone|iPad/.test(navigator.userAgent))window.close();},500);},300);};<\/script></body></html>`;
+
+  const css=`
+    @page{size:A4;margin:8mm 12mm}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+    body{font-family:Arial,sans-serif;font-size:8.5px;color:#111}
+    .main-title{text-align:center;font-size:13px;font-weight:700;margin-bottom:6px;padding-bottom:5px;border-bottom:2px solid #333}
+    .sub-title{text-align:center;font-size:8px;color:#666;margin-top:2px}
+    .month-block{margin-bottom:9px;page-break-inside:avoid;break-inside:avoid;}
+    .month-title{font-size:9.5px;font-style:italic;font-weight:700;margin-bottom:2px;color:#333;padding-left:1px}
+    table{width:100%;border-collapse:collapse;table-layout:fixed}
+    td{border:1px solid #bbb;text-align:center;padding:3px 0;font-size:7.5px;font-weight:700;white-space:nowrap;overflow:hidden;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .glbl{background:#e8e8e8!important;color:#222;font-size:7px;text-align:left;padding-left:3px;border-right:1.5px solid #888;width:28px}
+    .dnum{background:#f0f0f0!important;color:#333}
+    .dnum.sun{color:#fff!important;background:#1565C0!important}
+    .empty{background:#fafafa!important;border-color:#ddd}
+    .sc{font-weight:700}
+    .pagi{background:#FFF9C4!important;color:#5D4037!important}
+    .sore{background:#BBDEFB!important;color:#0D47A1!important}
+    .malam{background:#D1C4E9!important;color:#311b92!important}
+    .libur{background:#C62828!important;color:#fff!important}
+    .holi-notes{margin-top:3px;display:flex;flex-wrap:wrap;gap:2px 14px;padding-left:1px}
+    .holi-note{font-size:7px;color:#C62828;font-style:italic;white-space:nowrap}
+    .legend{display:flex;gap:12px;justify-content:center;margin:3px 0 7px;font-size:8px;flex-wrap:wrap}
+    .leg-item{display:flex;align-items:center;gap:4px}
+    .leg-box{width:12px;height:12px;border:1px solid #999}
+    .ftr{text-align:center;font-size:7px;color:#999;margin-top:6px;border-top:1px solid #eee;padding-top:3px}
+  `;
+
+  const legendHTML=`<div class="legend">
+    <div class="leg-item"><div class="leg-box" style="background:#FFF9C4"></div>1 = Pagi</div>
+    <div class="leg-item"><div class="leg-box" style="background:#BBDEFB"></div>2 = Sore</div>
+    <div class="leg-item"><div class="leg-box" style="background:#D1C4E9"></div>3 = Malam</div>
+    <div class="leg-item"><div class="leg-box" style="background:#C62828"></div>off = Libur</div>
+    <div class="leg-item"><div class="leg-box" style="background:#1565C0"></div>Minggu / Hari Libur</div>
+  </div>`;
+
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Schedule Kerja ${CY}</title><style>${css}</style></head><body>
+    <div class="main-title">Schedule Kerja Operator Produksi 4 Grup ${CY}<div class="sub-title">PT. Motasa Indonesia &nbsp;·&nbsp; Dicetak: ${pr}</div></div>
+    ${legendHTML}
+    ${blocks}
+    <div class="ftr">Generated by Malfoy ☆ — © ${CY}</div>
+    <script>window.onload=()=>{setTimeout(()=>{window.print();setTimeout(()=>{if(!/Android|iPhone|iPad/.test(navigator.userAgent))window.close();},500);},300);};<\/script>
+  </body></html>`;
+
   const w=window.open('','_blank');
   if(!w){alert('Izinkan popup!');return;}
   w.document.open();w.document.write(html);w.document.close();
